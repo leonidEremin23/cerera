@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<!--
+  ~ Copyright (c) 2020. Eremin
+  ~ 01.03.20 15:32
+  ~
+  -->
+
+<GridPane fx:id="txt" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="messages.Controller">
+   
+   <children>
+      <TextArea fx:id="txt_message" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Button fx:id="btn_test" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_test" text="Button" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+      <TextArea fx:id="txt_output" editable="false" prefHeight="100" prefWidth="200.0" promptText="standart output" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextArea fx:id="txt_errout" editable="false" prefHeight="100" prefWidth="200.0" promptText="error output" style="-fx-text-fill: red;" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+   </children>
+
+
+</GridPane>
