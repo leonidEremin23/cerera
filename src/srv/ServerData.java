@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020. Eremin
- * 01.03.20 19:09
+ * 02.03.20 16:33
  *
  */
 
@@ -18,6 +18,8 @@ import ae.R;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 public class ServerData {
   private final static String sKeyMetka  = "metka";
   private final static String sPrefixKey = "cerera#";
@@ -25,9 +27,14 @@ public class ServerData {
 
   public JSONArray load(String url, String key)
   {
+    return load(url, key, null);
+  }
+
+  public JSONArray load(String url, String key, Map<String,String> postArgs)
+  {
     ContentHttp conn = new ContentHttp();
     String txt;
-    txt = conn.getContent(R.Server + url);
+    txt = conn.getContent(R.getServer() + url, postArgs);
     if(txt == null) {
       System.err.println("?-error-нет данных от сервера");
       return null;

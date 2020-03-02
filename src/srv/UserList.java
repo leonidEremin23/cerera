@@ -17,7 +17,7 @@ public class UserList extends ServerData {
   private final static String sUrl = "userlist.php";  // получить список пользователей
   private final static String sKey = "userlist";  // ключ метки
 
-  ArrayList<String> mUsers = null;
+  private ArrayList<String> mUsers = null;
 
   public String[] read()
   {
@@ -27,6 +27,30 @@ public class UserList extends ServerData {
     // https://stackoverflow.com/questions/4042434/converting-arrayliststring-to-string-in-java
     String[] astr = mUsers.toArray(new String[0]);
     return astr;
+  }
+
+  /**
+   * очистить кэш данных
+   */
+  public void clean()
+  {
+    mUsers = null;
+  }
+
+  /**
+   * проверяет наличие в списке указанного имени
+   * @param username  имя
+   * @return true - пользоатель есть в списке, false - нет в списке
+   */
+  public boolean  inList(String username)
+  {
+    read();
+    for (String u: mUsers) {
+      if(u.contains(username)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

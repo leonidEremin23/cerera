@@ -19,7 +19,7 @@
       <Button fx:id="btn_test" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_test" text="Button" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
       <TextArea fx:id="txt_output" editable="false" prefHeight="100" prefWidth="200.0" promptText="standart output" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <TextArea fx:id="txt_errout" editable="false" prefHeight="100" prefWidth="200.0" promptText="error output" style="-fx-text-fill: red;" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="1" GridPane.rowIndex="3" />
    </children>
-
 
 </GridPane>

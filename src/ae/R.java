@@ -29,14 +29,15 @@ public class R {
   final static String Ver = "1.0"; // номер версии
 
   // рабочая БД
-  static final String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
+  private static final String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
   static public Database  db;   // база данных проекта
   // выдать временный каталог (завершается обратным слэшем)
-  public final static String TmpDir = System.getProperty("java.io.tmpdir");
+  //public final static String TmpDir = System.getProperty("java.io.tmpdir");
   // разделитель имени каталогов
-  public final static String sep = System.getProperty("file.separator");
+  //public final static String sep = System.getProperty("file.separator");
 
-  public static String Server = _r.Server;      // адрес сервера
+  private static String  Usr;        // имя пользователя в программе не задано
+  private static String  Server = _r.Server;  // адрес сервера
   static String ProxyServer = _r.proxyserv;  // proxy сервер
   static int    ProxyPort   = _r.proxyport;  // порт proxy-сервера
   static int    TimeOut     = 30000;         // тайм-аут мс
@@ -51,8 +52,8 @@ public class R {
   {
     final String create_tables =
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val text);" +
-        "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, publickey TEXT, privatekey TEXT, mykey INT DEFAULT 0, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
-            "INSERT INTO _Info(key) VALUES('Email');" +
+        "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
+            "INSERT INTO _Info(key) VALUES('Server');" +
             "";
     if(db == null) {
       db = new DatabaseSqlite(WorkDB);
@@ -79,6 +80,29 @@ public class R {
     R.ProxyPort       = R.getInfo(db, "ProxyPort",      R.ProxyPort);        // прокси порт
     R.ProxyUser       = R.getInfo(db, "ProxyUser",      R.ProxyUser);        // прокси пользователь
     R.ProxyPass       = R.getInfo(db, "ProxyPass",      R.ProxyPass);        // прокси пароль
+    //
+  }
+
+  /**
+   * Получить имя пользователя. Имя можно получить только
+   * из таблицы keys из записи с mykey=1
+   * @return имя пользователя
+   */
+  public static String getUsr()
+  {
+    if(R.Usr == null) {
+      // проверим в табл. keys собственный ключ есть?
+      String str = db.Dlookup("SELECT usr FROM keys WHERE mykey=1");
+      if (str != null && str.length() > 0) {
+        R.Usr = str;
+      }
+    }
+    return R.Usr;
+  }
+
+  public static String getServer()
+  {
+    return R.Server;
   }
 
   static public void dbClose()
@@ -238,7 +262,7 @@ public class R {
   private static String getInfo(Database db, String keyName, String defaultValue)
   {
       String val = db.Dlookup("SELECT val FROM _Info WHERE key='" + keyName + "'");
-      if(val == null /*|| val.length() < 1*/) {
+      if(val == null || val.length() < 1) {
           return defaultValue;
       }
       return val;
@@ -266,7 +290,7 @@ public class R {
   private static void putInfo(Database db, String keyName, String Value)
   {
     String val;
-    if(Value == null /*|| Value.length() < 1*/)
+    if(Value == null || Value.length() < 1)
       val = "null";
     else
       val = db.s2s(Value);
@@ -325,22 +349,22 @@ public class R {
     return txt;
   }
 
-  /**
-   * Выделить e-mail из входной строки
-   * @param inputStr входная строка
-   * @return строка e-mail или null если ажреса нет
-   */
-  public static String  extractEmail(String inputStr)
-  {
-    // регулярное выражение для выделения эл. адреса
-    Pattern email_pattern = Pattern.compile("[a-z0-9_.\\-]+@[a-z0-9.\\-]+\\.[a-z]{2,4}",Pattern.CASE_INSENSITIVE);
-    Matcher mat = email_pattern.matcher(inputStr);
-    if(mat.find()) {
-      String m = mat.group();
-      return m;
-    }
-    return null;
-  }
+//  /**
+//   * Выделить e-mail из входной строки
+//   * @param inputStr входная строка
+//   * @return строка e-mail или null если ажреса нет
+//   */
+//  public static String  extractEmail(String inputStr)
+//  {
+//    // регулярное выражение для выделения эл. адреса
+//    Pattern email_pattern = Pattern.compile("[a-z0-9_.\\-]+@[a-z0-9.\\-]+\\.[a-z]{2,4}",Pattern.CASE_INSENSITIVE);
+//    Matcher mat = email_pattern.matcher(inputStr);
+//    if(mat.find()) {
+//      String m = mat.group();
+//      return m;
+//    }
+//    return null;
+//  }
 
   /**
    * Выдать имя файла c расширением

@@ -26,11 +26,16 @@ import java.util.ResourceBundle;
 
 public class Controller extends OutputStream implements Initializable {
 
+  private Model model = new Model();
+
   @FXML
   TextArea  txt_message;
 
   @FXML
   Button    btn_test;
+
+  @FXML
+  Button    btn_register;
 
   @FXML
   TextArea  txt_output; // вывод выходного потока стандартный
@@ -127,4 +132,15 @@ public class Controller extends OutputStream implements Initializable {
 
   }
 
-}
+
+  /**
+   * регистрация нового пользователя
+   * @param ae
+   */
+  public void onclick_btn_register(ActionEvent ae)
+  {
+    keygenmy.Dialog dialog = new keygenmy.Dialog();
+    dialog.open(ae);
+  }
+
+} // end of class
