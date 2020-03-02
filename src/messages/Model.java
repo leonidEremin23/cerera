@@ -10,7 +10,14 @@
 
 package messages;
 
-public class Model {
+import srv.UserList;
 
+public class Model {
+  private UserList mUserList = new UserList();  // список пользователей на сервере
+
+  void readUsers()
+  {
+
+  }
 
 }

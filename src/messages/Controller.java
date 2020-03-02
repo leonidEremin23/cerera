@@ -15,7 +15,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +31,12 @@ public class Controller extends OutputStream implements Initializable {
   private Model model = new Model();
 
   @FXML
+  TextField txt_to;
+
+  @FXML
+  ComboBox<String>  cmb_users;
+
+  @FXML
   TextArea  txt_message;
 
   @FXML
@@ -36,6 +44,7 @@ public class Controller extends OutputStream implements Initializable {
 
   @FXML
   Button    btn_register;
+
 
   @FXML
   TextArea  txt_output; // вывод выходного потока стандартный
@@ -131,7 +140,6 @@ public class Controller extends OutputStream implements Initializable {
     }
 
   }
-
 
   /**
    * регистрация нового пользователя
