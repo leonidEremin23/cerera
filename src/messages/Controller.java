@@ -10,6 +10,7 @@
 
 package messages;
 
+import ae.R;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,17 +19,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import srv.ListMessages;
+import srv.SendMessage;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 
 public class Controller extends OutputStream implements Initializable {
 
   private Model model = new Model();
+
+  @FXML
+  TextField txt_usr;
 
   @FXML
   TextField txt_to;
@@ -122,23 +129,72 @@ public class Controller extends OutputStream implements Initializable {
 //    f_image.setImage(image2);
 //    //
 //    // заполним список пользователей про которых у нас есть ключи
-//    loadUsers();
-//    cmb_users.getSelectionModel().select(0);
+    loadUsers();
+    cmb_users.getSelectionModel().select(0);
+    onaction_cmb_users(null);
+    //
+    txt_usr.setText(R.getUsr());
 //    //
 //    onaction_cmb_users(null); // заполним поле адресата
   }
 
-
-  public void onclick_btn_test(ActionEvent ae)
+  /**
+   * заполнить список пользователей в комбо-боксе
+   */
+  private void  loadUsers()
   {
-    String[] astr;
-    srv.UserList usrs = new srv.UserList();
-    astr = usrs.read();
-    System.err.println(astr.length);
-    for(String s: astr) {
-      System.out.println(s);
-    }
+    String  str = cmb_users.getValue();
+    Collection<String> users = model.getUserNames();      // заполним список пользователей из локальной БД
+    cmb_users.getItems().removeAll(cmb_users.getItems()); // очистить список комбо-бокса
+    cmb_users.getItems().addAll(users);
+    if(str != null && str.length() > 1)
+      cmb_users.getSelectionModel().select(str);  // выбрать ранее выбранный
+  }
 
+  public void onclick_btn_send(ActionEvent ae)
+  {
+    String  un = R.trimWS(txt_to.getText());  // получить имя получателя
+    txt_to.setText(un); // запишем на всякий случай, без пробелов
+    //
+    if(!model.checkUserLocal(un)) {
+      if(!model.checkUserServer(un)) {
+        System.err.println("?-error-нет пользователя: " + un);
+        return;
+      } else {
+        loadUsers();  // перезагрузить пользователей
+      }
+    }
+    SendMessage sm = new SendMessage();
+    boolean b;
+    String msg = txt_message.getText();
+    b = sm.post(un, msg);
+    if(b) {
+      System.out.println(R.Now() + " сообщение отправлено");
+    }
+  }
+
+  public void onclick_btn_receive(ActionEvent ae)
+  {
+    ListMessages lm = new ListMessages();
+    String ufrom = txt_to.getText();
+    String uto = txt_usr.getText();
+    int[] ims;
+    ims = lm.get(ufrom, uto);
+    for(int i1: ims) {
+      System.out.println(i1);
+    }
+  }
+
+  /**
+   * При изменении списка получателей заполнить поле "получатель"
+   * @param ae  событие
+   */
+  public void onaction_cmb_users(ActionEvent ae)
+  {
+    String str;
+    str = cmb_users.getValue(); // значение выбранноего элемента
+    // System.out.println("Акция " + str);
+    txt_to.setText(str);
   }
 
   /**
@@ -149,6 +205,8 @@ public class Controller extends OutputStream implements Initializable {
   {
     keygenmy.Dialog dialog = new keygenmy.Dialog();
     dialog.open(ae);
+    //
+    txt_usr.setText(R.getUsr());
   }
 
 } // end of class

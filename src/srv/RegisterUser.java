@@ -9,12 +9,9 @@
  */
 package srv;
 
-import org.json.JSONArray;
-
 import java.util.HashMap;
 
 public class RegisterUser extends ServerData {
-  private final static String sUrl = "registeruser.php";  // зарегистрировать нового пользователя
   private final static String sKey = "registeruser";  // ключ метки
 
   /**
@@ -28,18 +25,9 @@ public class RegisterUser extends ServerData {
     HashMap<String,String> args = new HashMap<>();
     args.put("usr", usr);
     args.put("pubkey", pubkey);
-    JSONArray ja = load(sUrl, sKey, args);
-    if(ja != null) {
-      try {
-        String otv = (String) ja.get(0);
-        if(otv.contains("true")) {
-          return true;
-        }
-      } catch (Exception e) {
-        System.err.println("?-error-нет ответной строки");
-      }
-    }
-    return false;
+    boolean b;
+    b = super.post(sKey, args);
+    return b;
   }
 
 } // end of class

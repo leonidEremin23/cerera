@@ -83,10 +83,12 @@ public class Controller implements Initializable {
   {
     canRegister = false;
     String otvet;
-    String un = txt_user.getText(); // имя пользователя из поля
+    String str = txt_user.getText();  // имя пользователя из поля
+    String un = R.trimWS(str);        // уберем пробелы
     if(un == null || un.length() < 1) {
       otvet = "имя не задано!";
     } else {
+      txt_user.setText(un);
       boolean check = model.checkUsername(un);
       if (check) {
         otvet = "на сервере существует пользователь " + un;

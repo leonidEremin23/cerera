@@ -67,7 +67,7 @@ public class UserList extends ServerData {
           String str = (String) ja.get(i);
           arr.add(str);
         } catch (Exception e) {
-          System.out.println("?-warning-несоответствие типа строки: " + e.getMessage());
+          System.err.println("?-warning-несоответствие типа строки: " + e.getMessage());
         }
       }
     }

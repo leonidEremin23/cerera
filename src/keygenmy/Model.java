@@ -15,7 +15,7 @@ import java.util.Collection;
 
 public class Model {
 
-  private Database  db;
+  private Database  mDb;
   private String    public_key, private_key;  // ключи
   private String    lastError;
 
@@ -23,7 +23,7 @@ public class Model {
 
   Model()
   {
-    db = R.db;
+    mDb = R.getDb();
   }
 
   /**
@@ -83,8 +83,8 @@ public class Model {
     if(regusr.post(usrName, pubKey)) {
       // mykey = 1 - собственный пользователь
       sql = "INSERT INTO keys (mykey,usr,publickey,privatekey) VALUES(1,'" + usrName + "','" + pubKey + "','" + privKey + "')";
-      int a = db.ExecSql(sql);
-      lastError = db.getLastError();
+      int a = mDb.ExecSql(sql);
+      lastError = mDb.getLastError();
       return  (a == 1);
     }
     return false;
@@ -94,10 +94,10 @@ public class Model {
   {
     if(usrName == null || usrName.length()<1) return false;
     String  sql;
-    String  un  = db.s2s(usrName);
+    String  un  = mDb.s2s(usrName);
     sql = "DELETE FROM keys WHERE usr=" + un;
-    int a = db.ExecSql(sql);
-    lastError = db.getLastError();
+    int a = mDb.ExecSql(sql);
+    lastError = mDb.getLastError();
     return (a==1);
   }
 
@@ -112,7 +112,7 @@ public class Model {
   Collection<String>  getUsrsKeys()
   {
     // получим список имен из БД
-    ArrayList<String[]> ardb = db.DlookupArray("SELECT usr,mykey FROM keys WHERE (mykey) is null or mykey!=1 ORDER BY mykey,usr");
+    ArrayList<String[]> ardb = mDb.DlookupArray("SELECT usr,mykey FROM keys WHERE (mykey) is null or mykey!=1 ORDER BY mykey,usr");
     ArrayList<String> collect = new ArrayList<>();
     for (String[] rst: ardb) {
       collect.add(rst[0]); // добавим имя в массив
@@ -126,7 +126,7 @@ public class Model {
    */
   boolean checkMyKey()
   {
-    String  str = db.Dlookup("SELECT count(*) FROM keys WHERE mykey=1");
+    String  str = mDb.Dlookup("SELECT count(*) FROM keys WHERE mykey=1");
     if(Integer.parseInt(str) != 0) {
       return true;
     }

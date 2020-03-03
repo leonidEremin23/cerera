@@ -12,6 +12,11 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -30,7 +35,7 @@ public class R {
 
   // рабочая БД
   private static final String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
-  static public Database  db;   // база данных проекта
+  private static Database  db;   // база данных проекта
   // выдать временный каталог (завершается обратным слэшем)
   //public final static String TmpDir = System.getProperty("java.io.tmpdir");
   // разделитель имени каталогов
@@ -48,7 +53,7 @@ public class R {
   /**
    * Проверить наличие базы данных и создать нужные таблицы
    */
-  static void testDb()
+  private static void testDb()
   {
     final String create_tables =
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val text);" +
@@ -100,9 +105,23 @@ public class R {
     return R.Usr;
   }
 
+  /**
+   * выдать адрес web-сервера
+   * @return URL сервера до каталога с "функциями"
+   */
   public static String getServer()
   {
     return R.Server;
+  }
+
+  /**
+   * выдать локальную БД проекта
+   * @return БД проекта
+   */
+  public static Database getDb()
+  {
+    testDb();
+    return db;
   }
 
   static public void dbClose()
@@ -391,6 +410,19 @@ public class R {
   }
 
   /**
+   * вернуть строку без пробелов
+   * @param str входная строка
+   * @return строка без пробелов
+   */
+  public static String  trimWS(String str)
+  {
+    if(null == str)
+      return null;
+    String s = str.replaceAll("\\s","");
+    return s;
+  }
+
+  /**
    * Получить из события сцену, где оно случилось
    * @param ae  событие
    * @return  сцена
@@ -400,6 +432,28 @@ public class R {
     Node source = (Node) ae.getSource();
     Stage stage = (Stage) source.getScene().getWindow();
     return stage;
+  }
+
+  /**
+   * строка текущего времени
+   * @return текущее время
+   */
+  public static String Now()
+  {
+    return Now("HH:mm:ss"); // yyyy-MM-dd HH:mm:ss
+  }
+
+  /**
+   * строка текущей даты-времени заданного формата
+   * @param format формта
+   * @return текущее дата-время
+   */
+  public static String Now(String format)
+  {
+    LocalDateTime n = LocalDateTime.now();
+    DateTimeFormatter dtpat = DateTimeFormatter.ofPattern(format);
+    String s = n.format(dtpat);
+    return s;
   }
 
 } // end of class

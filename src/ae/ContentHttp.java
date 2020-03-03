@@ -186,7 +186,7 @@ public class ContentHttp {
         try {
           String ss = String.valueOf(response2.getStatusLine());
           if (!ss.matches(OkMatches)) {
-            System.out.println("?-Error-нет данных от сервера");
+            System.err.println("?-Error-нет данных от сервера");
             return null;
           }
           // долгожданный ответ
@@ -195,13 +195,13 @@ public class ContentHttp {
           response2.close();
         }
       } catch (Exception e) {
-        System.out.println(e.getMessage());
+        System.err.println(e.getMessage());
       } finally {
         httpclient.close();
       }
       //
     } catch (Exception e) {
-      System.out.println(e.getMessage());
+      System.err.println(e.getMessage());
     }
     return output;
   }

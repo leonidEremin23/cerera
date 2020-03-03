@@ -66,4 +66,27 @@ public class ServerData {
     return null;
   }
 
+  /**
+   * Послать запрос к серверу и проанализировать ответ на запрошенную операцию
+   * @param key   ключ операции
+   * @param args  аргументы посылки
+   * @return true задача выполнена, false задача не выполнена
+   */
+  boolean post(String key, Map<String, String> args)
+  {
+    String url = key + ".php";
+    JSONArray ja = load(url, key, args);
+    if(ja != null) {
+      try {
+        String otv = (String) ja.get(0);
+        if(otv.contains("true")) {
+          return true;
+        }
+      } catch (Exception e) {
+        System.err.println("?-error-нет ответной строки");
+      }
+    }
+    return false;
+  }
+
 } // end of class
