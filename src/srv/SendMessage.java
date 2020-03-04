@@ -9,6 +9,7 @@
  */
 package srv;
 
+import ae.MyCrypto;
 import ae.R;
 
 import java.util.HashMap;
@@ -24,12 +25,20 @@ public class SendMessage extends ServerData {
    */
   public boolean  post(String usr, String msg)
   {
+    // зашифруем сообщение
+    String pubkey = R.getDb().Dlookup("SELECT publickey FROM keys WHERE usr='" + usr + "'");
+    if(pubkey == null || pubkey.length() < 16) {
+      System.err.println("?-error-нет публичного ключа для пользователя: " + usr);
+      return false;
+    }
+    MyCrypto mc = new MyCrypto(pubkey, null);
+    String cry = mc.encryptText(msg);
+    //
     HashMap<String,String> args = new HashMap<>();
     args.put("from", R.getUsr());
-    args.put("to", usr);
-    args.put("msg", msg);
-    boolean b;
-    b = super.post(sKey, args);
-    return b;
+    args.put("to",   usr);
+    args.put("msg",  cry);
+
+    return super.post(sKey, args);
   }
 }

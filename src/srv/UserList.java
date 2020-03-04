@@ -10,23 +10,20 @@
 
 package srv;
 
-import org.json.JSONArray;
-import java.util.ArrayList;
-
 public class UserList extends ServerData {
-  private final static String sUrl = "userlist.php";  // получить список пользователей
   private final static String sKey = "userlist";  // ключ метки
 
-  private ArrayList<String> mUsers = null;
+  private String[] mUsers = null;
 
   public String[] read()
   {
     if(mUsers == null) {
       loadUsers();
+      if(mUsers == null) {
+        mUsers = new String[0];
+      }
     }
-    // https://stackoverflow.com/questions/4042434/converting-arrayliststring-to-string-in-java
-    String[] astr = mUsers.toArray(new String[0]);
-    return astr;
+    return mUsers;
   }
 
   /**
@@ -58,20 +55,7 @@ public class UserList extends ServerData {
    */
   private void  loadUsers()
   {
-    ArrayList<String> arr = new ArrayList<>();
-    JSONArray ja = super.load(sUrl, sKey);
-    if(ja != null) {
-      int n = ja.length();
-      for(int i=0; i <  n; i++) {
-        try {
-          String str = (String) ja.get(i);
-          arr.add(str);
-        } catch (Exception e) {
-          System.err.println("?-warning-несоответствие типа строки: " + e.getMessage());
-        }
-      }
-    }
-    mUsers = arr;
+    mUsers = super.postStr(sKey, null);
   }
 
 } // end of class

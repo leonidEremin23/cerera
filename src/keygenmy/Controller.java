@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -31,9 +32,11 @@ public class Controller implements Initializable {
   @FXML
   Button      btn_keygen;
   @FXML
-  Button btn_check;
+  Button      btn_check;
   @FXML
   Button      btn_close;
+  @FXML
+  Label       lbl_server;
 
   /**
    * Вызывается при инициализации root объекта, будем заполнять ComboBox данными из БД
@@ -43,8 +46,10 @@ public class Controller implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources)
   {
-    //
+    // показать имя
     txt_user.setText(R.getUsr());
+    // показать сервер
+    lbl_server.setText(R.getServer());
   }
 
   /**

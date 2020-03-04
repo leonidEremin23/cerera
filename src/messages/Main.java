@@ -24,12 +24,15 @@ public class Main extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("messages.fxml"));
     primaryStage.getIcons().add(new Image("res/app.png"));
     primaryStage.setTitle("Обмен зашифрованными сообщениями");
-    primaryStage.setScene(new Scene(root, 800, 500));
+    primaryStage.setScene(new Scene(root, 900, 500));
     primaryStage.getScene().getStylesheets().add("css/JMetroLightTheme.css"); //подключим стили
     primaryStage.show();
   }
 
   public static void main(String[] args) {
+    if (args.length > 0) {
+      R.setWorkDb(args[0]); // первый аргумент командной строки - имя файла БД
+    }
     R.loadDefault();
     launch(args);
   }

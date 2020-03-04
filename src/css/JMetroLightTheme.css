@@ -33,9 +33,9 @@
 .button {
     -fx-padding: 5 22 5 22;   
     -fx-border-style: null; 
-    -fx-background-radius: 0;
+    -fx-background-radius: 4;
 
-    -fx-background-color: #adf0e8;
+    -fx-background-color: #a5daf0;
   
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
     -fx-font-size: 11pt;
@@ -682,7 +682,23 @@
 #txt_result .content {
     -fx-background-color: transparent;
 }
-#txt_result {
+
+#txt_output {
     -fx-font-family: Consolas;
-    -fx-text-fill: darkgreen;
+    -fx-text-fill: green;
 }
+/* зададим фон для конкретного поля */
+#txt_output .content {
+    -fx-background-color: #d6ecb7;
+}
+
+#txt_errout {
+    -fx-font-family: Consolas;
+    -fx-text-fill: red;
+}
+
+/* зададим фон для конкретного поля */
+#txt_errout .content {
+    -fx-background-color: #e2ecb5;
+}
+

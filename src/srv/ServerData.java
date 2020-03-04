@@ -18,42 +18,41 @@ import ae.R;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ServerData {
-  private final static String sKeyMetka  = "metka";
-  private final static String sPrefixKey = "cerera#";
-  private final static String sKeyArray  = "array";
+  private final static String sKeyResult = "result";
+  private final static String sKeyData   = "data";
 
-  public JSONArray load(String url, String key)
-  {
-    return load(url, key, null);
-  }
-
-  public JSONArray load(String url, String key, Map<String,String> postArgs)
+  /**
+   * запрос к серверу и анализ ответа
+   * @param key       ключ запроса
+   * @param postArgs  аргументы POST
+   * @return массив JSON
+   */
+  public JSONArray load(String key, Map<String,String> postArgs)
   {
     ContentHttp conn = new ContentHttp();
     String txt;
-    txt = conn.getContent(R.getServer() + url, postArgs);
+    txt = conn.getContent(R.getServer() + key + ".php", postArgs);
     if(txt == null) {
       System.err.println("?-error-нет данных от сервера");
       return null;
     }
     try {
       JSONObject jo = new JSONObject(txt);
-      // ищем метку
-      Object om = jo.get(sKeyMetka);
-      if(om == null) {
-        System.err.println("?-error-нет метки");
+      // ищем поле result(boolean)
+      Object or = jo.get(sKeyResult);
+      if(or == null) {
+        System.err.println("?-error-нет результата");
         return null;
       }
-      String metka = (String) om;
-      if(!metka.contentEquals(sPrefixKey + key)) {
-        System.err.println("?-warning-метка: " + metka + " не соответствует, нужно key=" + key);
-        return null;
-      }
+      boolean r = (boolean) or;
+      if(!r)
+        return null;  // результат не true
       // ищем массив
-      Object oa = jo.get(sKeyArray);
+      Object oa = jo.get(sKeyData);
       if(oa == null) {
         System.err.println("?-error-нет массива");
         return null;
@@ -75,18 +74,66 @@ public class ServerData {
   boolean post(String key, Map<String, String> args)
   {
     String url = key + ".php";
-    JSONArray ja = load(url, key, args);
+    JSONArray ja = load(key, args);
     if(ja != null) {
-      try {
-        String otv = (String) ja.get(0);
-        if(otv.contains("true")) {
-          return true;
-        }
-      } catch (Exception e) {
-        System.err.println("?-error-нет ответной строки");
-      }
+      return true;
     }
     return false;
+  }
+
+  /**
+   * Послать запрос к серверу и получить массив строк
+   * @param key   ключ операции
+   * @param args  аргументы посылки
+   * @return true задача выполнена, false задача не выполнена
+   */
+  String[] postStr(String key, Map<String, String> args)
+  {
+    JSONArray ja = load(key, args);
+    if(ja != null) {
+      ArrayList<String> arr = new ArrayList<>();
+      int n = ja.length();
+      for(int i = 0; i < n; i++) {
+        try {
+          String s = (String) ja.get(i);
+          arr.add(s);
+        } catch (Exception e) {
+          System.err.println("?-error-тип элемента массива не String");
+          return null;
+        }
+      }
+      // ArrayList в массив
+      // https://stackoverflow.com/questions/4042434/converting-arrayliststring-to-string-in-java
+      String[] as = arr.toArray(new String[0]);
+      return  as;
+    }
+    return null;
+  }
+
+  /**
+   * Послать запрос к серверу и получить массив чисел
+   * @param key   ключ операции
+   * @param args  аргументы посылки
+   * @return true задача выполнена, false задача не выполнена
+   */
+  int[] postInt(String key, Map<String, String> args)
+  {
+    JSONArray ja = load(key, args);
+    if(ja != null) {
+      int n = ja.length();
+      int[] ar = new int[n];
+      for(int i = 0; i < n; i++) {
+        try {
+          Integer ii = (Integer) ja.get(i);
+          ar[i] = ii;
+        } catch (Exception e) {
+          System.err.println("?-error-тип элемента массива не int");
+          return null;
+        }
+      }
+      return  ar;
+    }
+    return null;
   }
 
 } // end of class

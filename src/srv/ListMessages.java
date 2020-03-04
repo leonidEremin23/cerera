@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import java.util.HashMap;
 
 public class ListMessages extends ServerData {
-  private final static String sKey = "list";  // ключ метки
+  private final static String sKey = "listmessages";  // ключ метки
 
   public int[] get(String uFrom, String uTo)
   {
@@ -24,20 +24,9 @@ public class ListMessages extends ServerData {
     if(uTo != null)
       args.put("to", uTo);
     //
-    JSONArray ja = super.load(sKey + ".php", sKey, args);
-    if(ja != null) {
-      int n = ja.length();
-      int[] ari = new int[n];
-      for(int i=0; i <  n; i++) {
-        try {
-          ari[i] = (Integer) ja.get(i);
-        } catch (Exception e) {
-          System.err.println("?-warning-несоответствие типа строки: " + e.getMessage());
-        }
-      }
-      return ari;
-    }
-    return null;
+    int[] ari;
+    ari = super.postInt(sKey, args);
+    return ari;
   }
 
 } // end of class

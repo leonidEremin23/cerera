@@ -180,8 +180,13 @@ public class Controller extends OutputStream implements Initializable {
     String uto = txt_usr.getText();
     int[] ims;
     ims = lm.get(ufrom, uto);
-    for(int i1: ims) {
-      System.out.println(i1);
+    if(ims != null) {
+      System.out.println(R.Now() + " ");
+      for (int i1 : ims) {
+        System.out.println(i1);
+      }
+    } else {
+      System.err.println("?-error-нет данных с номерами сообщений");
     }
   }
 

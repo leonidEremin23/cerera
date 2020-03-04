@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
 
 <!--
   ~ Copyright (c) 2020. Eremin
@@ -16,8 +15,7 @@
   ~
   -->
 
-<GridPane fx:id="txt" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="messages.Controller">
+<GridPane fx:id="txt" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="messages.Controller">
 
     <Label prefHeight="22.0" text="пользователь" GridPane.columnIndex="1" GridPane.rowIndex="1" />
     <Label prefHeight="22.0" text="получатель" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -25,21 +23,38 @@
     <Label prefHeight="22.0" text="отправитель" GridPane.columnIndex="1" GridPane.rowIndex="4" />
     <Label prefHeight="22.0" text="прием" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-    <TextField fx:id="txt_usr" text="usr" GridPane.columnIndex="2" GridPane.rowIndex="1" editable="false" />
+    <TextField fx:id="txt_usr" editable="false" text="usr" GridPane.columnIndex="2" GridPane.rowIndex="1" />
     <TextField fx:id="txt_to" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-    <ComboBox fx:id="cmb_users" onAction="#onaction_cmb_users" GridPane.columnIndex="3" GridPane.rowIndex="2" minWidth="200.0"/>
+    <ComboBox fx:id="cmb_users" minWidth="200.0" onAction="#onaction_cmb_users" GridPane.columnIndex="3" GridPane.rowIndex="2" />
 
-    <TextArea fx:id="txt_message" GridPane.columnIndex="2" GridPane.rowIndex="3" prefHeight="100" />
+    <TextArea fx:id="txt_message" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="3" />
     <Button fx:id="btn_test" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_send" text="Отправить" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
 
     <TextField fx:id="txt_sender" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-    <TextArea fx:id="txt_receive" GridPane.columnIndex="2" GridPane.rowIndex="5" prefHeight="100" />
+    <TextArea fx:id="txt_receive" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="5" />
     <Button fx:id="btn_receive" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_receive" text="Принять" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
 
     <TextArea fx:id="txt_output" editable="false" prefHeight="100" promptText="standart output" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-    <TextArea fx:id="txt_errout" editable="false" prefHeight="100" promptText="error output" style="-fx-text-fill: red;" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+    <TextArea fx:id="txt_errout" editable="false" prefHeight="100" promptText="error output" GridPane.columnIndex="2" GridPane.rowIndex="7" />
 
     <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
 
 
 </GridPane>

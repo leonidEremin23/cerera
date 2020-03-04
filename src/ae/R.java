@@ -34,7 +34,7 @@ public class R {
   final static String Ver = "1.0"; // номер версии
 
   // рабочая БД
-  private static final String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
+  private static String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
   private static Database  db;   // база данных проекта
   // выдать временный каталог (завершается обратным слэшем)
   //public final static String TmpDir = System.getProperty("java.io.tmpdir");
@@ -58,7 +58,7 @@ public class R {
     final String create_tables =
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val text);" +
         "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
-            "INSERT INTO _Info(key) VALUES('Server');" +
+            "INSERT INTO _Info(key,val) VALUES('Server','');" +
             "";
     if(db == null) {
       db = new DatabaseSqlite(WorkDB);
@@ -112,6 +112,16 @@ public class R {
   public static String getServer()
   {
     return R.Server;
+  }
+
+  /**
+   * задать новое имя файла локальной БД
+   * @param filename  имя файла
+   */
+  public static void setWorkDb(String filename)
+  {
+    dbClose();
+    R.WorkDB = filename;
   }
 
   /**

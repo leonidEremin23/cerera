@@ -412,8 +412,9 @@ public class MyCrypto {
     if(crypt_mess == null)
       return "<encrypt error>";
     String res = byte2Hex(crypt_mess);    // перевести в HEX
-    String otvet = wrapLine(res);         // разбить на строки
-    return otvet;
+    return res;
+//    String otvet = wrapLine(res);         // разбить на строки
+//    return otvet;
   }
 
   /**
