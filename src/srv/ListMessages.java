@@ -10,7 +10,6 @@
 package srv;
 
 import ae.R;
-import org.json.JSONArray;
 
 import java.util.HashMap;
 
@@ -19,7 +18,7 @@ public class ListMessages extends ServerData {
 
   public int[] get(String uFrom, String uTo)
   {
-    String pwd = getPwd(uTo);
+    String pwd = R.getUsrPwd(uTo);
     if(pwd == null) {
       return null;
     }

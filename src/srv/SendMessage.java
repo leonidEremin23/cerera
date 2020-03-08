@@ -29,8 +29,8 @@ public class SendMessage extends ServerData {
     String usrFrom = R.getUsr(); // отправитель
     Database db = R.getDb();  // база данных
     // зашифруем сообщение
-    String pubkey = db.Dlookup("SELECT publickey FROM keys WHERE usr='" + usrTo + "'");
-    String pwd = db.Dlookup("SELECT pwd FROM keys WHERE usr='" + usrFrom + "'");
+    String pubkey = R.getUsrPublickey(usrTo);
+    String pwd = R.getUsrPwd(usrFrom);
     if(pubkey == null || pubkey.length() < 16 || pwd == null) {
       System.err.println("?-error-нет публичного ключа для пользователя: " + usrTo);
       return false;

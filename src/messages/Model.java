@@ -27,7 +27,7 @@ class Model {
 
   Model()
   {
-    mDb = R.getDb();
+    this.mDb = R.getDb();
   }
 
   /**
@@ -39,7 +39,8 @@ class Model {
     ArrayList<String[]> ard;
     ard = mDb.DlookupArray("SELECT usr FROM keys WHERE mykey!=1 ORDER BY usr");
     ArrayList<String> list = new ArrayList<>();
-    for(String[] r: ard) list.add(r[0]); // добавим имя в массив
+    for(String[] r: ard)
+      list.add(r[0]); // добавим имя в массив
     return  list;
   }
 
@@ -77,7 +78,7 @@ class Model {
         sql = "INSERT INTO keys (usr,publickey) VALUES('" + username + "','" + pubkey + "')";
         int a = mDb.ExecSql(sql);
         if(a != 1) {
-          System.err.println("?-error-не добавлен в табл. keys пользователь: " + username);
+          System.err.println("?-error-в табл. keys не добавлен пользователь: " + username);
         } else {
           return true;
         }
@@ -88,19 +89,6 @@ class Model {
     return false;
   }
 
-  /**
-   * выдать публичный ключ пользователя из локальной БД
-   * @param username имя пользователя
-   * @return публичный ключ
-   */
-  String getPublicKey(String username)
-  {
-    String pubkey;
-    pubkey = mDb.Dlookup("SELECT publickey FROM usr='" + username + "'");
-    if(pubkey != null && pubkey.length() < 16)
-      return null;  // если ключ короткий - это ошибочный ключ
-    return pubkey;
-  }
 
   /**
    * получить сообщение для текущего от пользователя
@@ -122,13 +110,7 @@ class Model {
       int im = nma[0];  // номер первого в списке сообщения
       Message ms = new Message();
       String msg = ms.get(usrTo, im);
-      if(msg != null) {
-        // есть сообщение, расшифруем его
-        String privkey = ms.getPrivatekey(usrTo);
-        MyCrypto crypto = new MyCrypto(null, privkey);
-        String txt = crypto.decryptText(msg);
-        return txt;
-      }
+      return msg;
     }
     return null;
   }

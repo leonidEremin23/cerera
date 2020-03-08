@@ -54,10 +54,10 @@ public class R {
   private static void testDb()
   {
     final String create_tables =
-        "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val text);" +
+        "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val TEXT);" +
         "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, pwd TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
-            "INSERT INTO _Info(key,val) VALUES('Server','');" +
-            "";
+        "INSERT INTO _Info(key,val) VALUES('Server','http://localhost/webcerera/srv/');" +
+        "";
     if(db == null) {
       db = new DatabaseSqlite(WorkDB);
       //
@@ -460,7 +460,66 @@ public class R {
   {
     LocalDateTime n = LocalDateTime.now();
     DateTimeFormatter dtpat = DateTimeFormatter.ofPattern(format);
-    String s = n.format(dtpat);
+    return n.format(dtpat);
+  }
+
+  /**
+   * вернуть пароль пользователя
+   * @param usr пользователь
+   * @return пароль (null ошибка)
+   */
+  public static String  getUsrPwd(String usr)
+  {
+    String pwd = R.getDb().Dlookup("SELECT pwd FROM keys where usr='" + usr + "'");
+    if(pwd == null || pwd.length() < 1) {
+      System.err.println("?-error-getUsrPwd() нет пароля пользователя: " + usr);
+      return null;
+    }
+    return pwd;
+  }
+
+  /**
+   * получить открытый ключ пользователя
+   * @param usr пользователь
+   * @return открытый ключ (null ошибка)
+   */
+  public static String getUsrPublickey(String usr)
+  {
+    String key = getStrField(usr, "publickey");
+    if(key == null) {
+      System.err.println("?-error-getUsrPublickey() нет открытого ключа пользователя: " + usr);
+      return null;
+    }
+    return key;
+  }
+
+  /**
+   * получить приватный ключ пользователя
+   * @param usr пользователь
+   * @return приватный ключ (null ошибка)
+   */
+  public static String getUsrPrivatekey(String usr)
+  {
+    String key = getStrField(usr, "privatekey");
+    if(key == null) {
+      System.err.println("?-error-getUsrPublickey() нет приватного ключа пользователя: " + usr);
+      return null;
+    }
+    return key;
+  }
+
+  /**
+   * вернуть строковое поля из табл. users
+   * @param usr   пользователь
+   * @param fld   имя поля
+   * @return значение поля или null
+   */
+  private static String getStrField(String usr, String fld)
+  {
+    String s = getDb().Dlookup("SELECT " + fld + " FROM keys WHERE usr='" + usr + "'");
+    if(s == null || s.length() < 1) {
+      return null;
+    }
     return s;
   }
 

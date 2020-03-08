@@ -73,7 +73,6 @@ public class ServerData {
    */
   boolean post(String key, Map<String, String> args)
   {
-    String url = key + ".php";
     JSONArray ja = load(key, args);
     if(ja != null) {
       return true;
@@ -136,64 +135,5 @@ public class ServerData {
     return null;
   }
 
-  /**
-   * вернуть пароль пользователя
-   * @param usr пользователь
-   * @return пароль (null ошибка)
-   */
-  public String  getPwd(String usr)
-  {
-    String pwd = R.getDb().Dlookup("SELECT pwd FROM keys where usr='" + usr + "'");
-    if(pwd == null || pwd.length() < 1) {
-      System.err.println("?-error-getPwd() нет пароля пользователя: " + usr);
-      return null;
-    }
-    return pwd;
-  }
-
-  /**
-   * получить открытый ключ пользователя
-   * @param usr пользователь
-   * @return открытый ключ (null ошибка)
-   */
-  public String getPublickey(String usr)
-  {
-    String key = getStrField(usr, "publickey");
-    if(key == null) {
-      System.err.println("?-error-getPublickey() нет открытого ключа пользователя: " + usr);
-      return null;
-    }
-    return key;
-  }
-
-  /**
-   * получить приватный ключ пользователя
-   * @param usr пользователь
-   * @return приватный ключ (null ошибка)
-   */
-  public String getPrivatekey(String usr)
-  {
-    String key = getStrField(usr, "privatekey");
-    if(key == null) {
-      System.err.println("?-error-getPublickey() нет приватного ключа пользователя: " + usr);
-      return null;
-    }
-    return key;
-  }
-
-  /**
-   * вернуть строковое поля из табл. users
-   * @param usr   пользователь
-   * @param fld   имя поля
-   * @return значение поля или null
-   */
-  private String getStrField(String usr, String fld)
-  {
-    String s = R.getDb().Dlookup("SELECT " + fld + " FROM keys WHERE usr='" + usr + "'");
-    if(s == null || s.length() < 1) {
-      return null;
-    }
-    return s;
-  }
 
 } // end of class
