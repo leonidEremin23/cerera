@@ -13,9 +13,6 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Scanner;
@@ -27,11 +24,12 @@ import java.util.regex.Pattern;
 */
 /*
 Modify:
+  08.03.20  передача и прием сообщений
 
 */
 
 public class R {
-  final static String Ver = "1.0"; // номер версии
+  final static String Ver = "2.0"; // номер версии
 
   // рабочая БД
   private static String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
@@ -57,7 +55,7 @@ public class R {
   {
     final String create_tables =
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val text);" +
-        "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
+        "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, pwd TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
             "INSERT INTO _Info(key,val) VALUES('Server','');" +
             "";
     if(db == null) {

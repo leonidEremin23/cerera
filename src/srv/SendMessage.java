@@ -9,6 +9,7 @@
  */
 package srv;
 
+import ae.Database;
 import ae.MyCrypto;
 import ae.R;
 
@@ -19,24 +20,28 @@ public class SendMessage extends ServerData {
 
   /**
    * послать данные про новое сообщение
-   * @param usr     имя получателя
+   * @param usrTo   имя получателя
    * @param msg     текст сообщения
-   * @return true - пользователь зарегистрирован, false - ошибка регистрации
+   * @return true - сообщение отправлено, false - ошибка
    */
-  public boolean  post(String usr, String msg)
+  public boolean  post(String usrTo, String msg)
   {
+    String usrFrom = R.getUsr(); // отправитель
+    Database db = R.getDb();  // база данных
     // зашифруем сообщение
-    String pubkey = R.getDb().Dlookup("SELECT publickey FROM keys WHERE usr='" + usr + "'");
-    if(pubkey == null || pubkey.length() < 16) {
-      System.err.println("?-error-нет публичного ключа для пользователя: " + usr);
+    String pubkey = db.Dlookup("SELECT publickey FROM keys WHERE usr='" + usrTo + "'");
+    String pwd = db.Dlookup("SELECT pwd FROM keys WHERE usr='" + usrFrom + "'");
+    if(pubkey == null || pubkey.length() < 16 || pwd == null) {
+      System.err.println("?-error-нет публичного ключа для пользователя: " + usrTo);
       return false;
     }
     MyCrypto mc = new MyCrypto(pubkey, null);
     String cry = mc.encryptText(msg);
     //
     HashMap<String,String> args = new HashMap<>();
-    args.put("from", R.getUsr());
-    args.put("to",   usr);
+    args.put("from", usrFrom);
+    args.put("pwd",  pwd);
+    args.put("to",   usrTo);
     args.put("msg",  cry);
 
     return super.post(sKey, args);

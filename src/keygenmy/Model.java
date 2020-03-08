@@ -13,7 +13,7 @@ import java.util.Collection;
  Модель формирования собственного ключа
  */
 
-public class Model {
+class Model {
 
   private Database  mDb;
   private String    public_key, private_key;  // ключи
@@ -37,28 +37,17 @@ public class Model {
   }
 
   /**
-   * Запомнить ключи шифрования
-   * @param pubKey
-   * @param privKey
-   */
-  void rememberKeys(String pubKey, String privKey)
-  {
-    public_key = pubKey;
-    private_key = privKey;
-  }
-
-
-  /**
    * Генерировать пару ключей RSA
-   * @return  String[2] [0]:public [1]:private ключи
+   * @return  String[2] [0]:public [1]:private ключи [2]:случайная строка
    */
-  public String[] keyGen()
+  String[] keyGen()
   {
     MyCrypto mc = new MyCrypto(null,null);
     mc.generateKeys();
-    String[]  keys = new String[2];
+    String[]  keys = new String[3];
     keys[0] = mc.getPublicKey();
     keys[1] = mc.getPrivateKey();
+    keys[2] = mc.randomString(16);
     return keys;
   }
 
@@ -67,9 +56,10 @@ public class Model {
    * @param usrName имя собственного пользователя
    * @param pubKey  публичный ключ
    * @param privKey приватный ключ
-   * @return
+   * @param usrPwd  пароль пользователя
+   * @return true добавлен пользователь, false не добавлен
    */
-  boolean  addUser(String usrName, String pubKey, String privKey)
+  boolean  addUser(String usrName, String pubKey, String privKey,String usrPwd)
   {
     lastError = "Неправильные аргументы";
     if(usrName == null || pubKey == null || privKey == null) return false;
@@ -80,9 +70,10 @@ public class Model {
     }
     String  sql;
     RegisterUser regusr = new RegisterUser();
-    if(regusr.post(usrName, pubKey)) {
+    if(regusr.post(usrName, pubKey, usrPwd)) {
       // mykey = 1 - собственный пользователь
-      sql = "INSERT INTO keys (mykey,usr,publickey,privatekey) VALUES(1,'" + usrName + "','" + pubKey + "','" + privKey + "')";
+      sql = "INSERT INTO keys (mykey,usr,publickey,privatekey,pwd) " +
+          "VALUES(1,'" + usrName + "','" + pubKey + "','" + privKey + "','" + usrPwd +"')";
       int a = mDb.ExecSql(sql);
       lastError = mDb.getLastError();
       return  (a == 1);
@@ -101,7 +92,7 @@ public class Model {
     return (a==1);
   }
 
-  public String getLastError() {
+  String getLastError() {
     return lastError;
   }
 
@@ -122,7 +113,7 @@ public class Model {
 
   /**
    * Проверить наличие в локальной БД собственного ключа
-   * @return
+   * @return true есть собственный ключ
    */
   boolean checkMyKey()
   {
@@ -134,4 +125,3 @@ public class Model {
   }
 
 } // end of class
-

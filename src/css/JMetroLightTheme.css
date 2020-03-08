@@ -697,8 +697,14 @@
     -fx-text-fill: red;
 }
 
-/* зададим фон для конкретного поля */
+/* зададим фон для конкретного поля TextArea */
 #txt_errout .content {
     -fx-background-color: #e2ecb5;
 }
 
+#txt_usr {
+    -fx-font-weight: bold;
+    -fx-font-size: 11pt;
+    -fx-text-fill: #158b16;
+    -fx-background-color: #d4e9f3;
+}

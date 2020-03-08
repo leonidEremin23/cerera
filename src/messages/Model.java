@@ -5,20 +5,23 @@
  */
 
 /*
-   Модель отправки и получения сообщений
+   Модель отправки и получения сообщений через web-сервер
  */
 
 package messages;
 
 import ae.Database;
+import ae.MyCrypto;
 import ae.R;
+import srv.ListMessages;
+import srv.Message;
 import srv.PubKey;
 import srv.UserList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Model {
+class Model {
   private UserList mUserList = new UserList();  // список пользователей на сервере
   private Database mDb;
 
@@ -29,7 +32,7 @@ public class Model {
 
   /**
    * список пользователей локальной БД
-   * @return
+   * @return коллекция строк с именами пользователей
    */
   Collection<String> getUserNames()
   {
@@ -42,8 +45,8 @@ public class Model {
 
   /**
    * проверить пользователя в локальной БД
-   * @param username
-   * @return
+   * @param username  имя пользователя
+   * @return true есть пользователь
    */
   boolean checkUserLocal(String username)
   {
@@ -57,7 +60,7 @@ public class Model {
 
   /**
    * проверить пользователя на сервере и если есть добавить его в локальную БД
-   * @param username
+   * @param username  имя пользователя
    * @return true есть пользователь, false - нет пользователя
    */
   boolean checkUserServer(String username)
@@ -99,5 +102,35 @@ public class Model {
     return pubkey;
   }
 
-} // end of class
+  /**
+   * получить сообщение для текущего от пользователя
+   * @param usrFrom имя пользователя
+   * @return текст сообщения
+   */
+  String  getMessage(String usrFrom)
+  {
+    String usrTo = R.getUsr();
+    if(usrTo == null) {
+      System.err.println("?-error-не задан текущий пользователь");
+      return null;
+    }
+    // получить список сообщений
+    ListMessages lm = new ListMessages();
+    int[] nma = lm.get(usrFrom, usrTo);
+    if(nma != null && nma.length > 0) {
+      // список есть
+      int im = nma[0];  // номер первого в списке сообщения
+      Message ms = new Message();
+      String msg = ms.get(usrTo, im);
+      if(msg != null) {
+        // есть сообщение, расшифруем его
+        String privkey = ms.getPrivatekey(usrTo);
+        MyCrypto crypto = new MyCrypto(null, privkey);
+        String txt = crypto.decryptText(msg);
+        return txt;
+      }
+    }
+    return null;
+  }
 
+} // end of class

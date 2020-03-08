@@ -47,11 +47,19 @@ public class Controller extends OutputStream implements Initializable {
   TextArea  txt_message;
 
   @FXML
-  Button    btn_test;
+  public TextField txt_from;
+
+  @FXML
+  public TextArea txt_receive;
+
+  @FXML
+  Button btn_send;
+
+  @FXML
+  Button btn_receive;
 
   @FXML
   Button    btn_register;
-
 
   @FXML
   TextArea  txt_output; // вывод выходного потока стандартный
@@ -97,8 +105,8 @@ public class Controller extends OutputStream implements Initializable {
         write(b, 0, b.length);
       }
     };
-    System.setOut(new PrintStream(out, true));
-    System.setErr(new PrintStream(err, true));
+//    System.setOut(new PrintStream(out, true));
+//    System.setErr(new PrintStream(err, true));
     //
     initialRun();
   }
@@ -120,22 +128,12 @@ public class Controller extends OutputStream implements Initializable {
    */
   private void initialRun()
   {
-//    lbl_email.setText(R.Email);
-//    //
-//    //File file = new File("src/res/app.png");
-//    //String uri = file.toURI().toString();
-//    //InputStream input2 = getClass().getResourceAsStream("src/res/app1.png");
-//    Image image2 = new Image("res/appgray.png");
-//    f_image.setImage(image2);
-//    //
-//    // заполним список пользователей про которых у нас есть ключи
+    // заполним список пользователей про которых у нас есть ключи
     loadUsers();
     cmb_users.getSelectionModel().select(0);
-    onaction_cmb_users(null);
+    onaction_cmb_users(null);   // заполним поле адресата
     //
     txt_usr.setText(R.getUsr());
-//    //
-//    onaction_cmb_users(null); // заполним поле адресата
   }
 
   /**
@@ -188,6 +186,14 @@ public class Controller extends OutputStream implements Initializable {
     } else {
       System.err.println("?-error-нет данных с номерами сообщений");
     }
+    // получим сообщение от отправителя
+    String usrFrom = txt_from.getText();
+    String str = model.getMessage(usrFrom);
+    if(str == null) {
+      str = "<сообщений нет>";
+    }
+    txt_receive.setText(str);
+
   }
 
   /**
@@ -200,11 +206,12 @@ public class Controller extends OutputStream implements Initializable {
     str = cmb_users.getValue(); // значение выбранноего элемента
     // System.out.println("Акция " + str);
     txt_to.setText(str);
+    txt_from.setText(str);
   }
 
   /**
    * регистрация нового пользователя
-   * @param ae
+   * @param ae событие
    */
   public void onclick_btn_register(ActionEvent ae)
   {

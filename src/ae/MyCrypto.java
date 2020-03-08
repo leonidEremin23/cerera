@@ -73,13 +73,13 @@ public class MyCrypto {
   }
 
   /**
-   * Зашифровать сообщение для публичным ключом.
+   * Зашифровать сообщение публичным ключом.
    * Зашифровываем сообщения публичным ключом Получателя Сообщения
    *
    * @param message сообщение
    * @return зашифрованная строка из 16-ричных символов
    */
-  public String encrypt(String message) {
+  private String encrypt(String message) {
     String otv = "<error encrypt>";
     try {
       byte[] cipherText = encryptRSA(message.getBytes());
@@ -111,7 +111,7 @@ public class MyCrypto {
    * @return  зашифрованное сообщение
    * @throws GeneralSecurityException
    */
-  protected byte[] encryptAES(byte[] key, byte[] mess) throws GeneralSecurityException
+  private byte[] encryptAES(byte[] key, byte[] mess) throws GeneralSecurityException
   {
     final Cipher cipher = Cipher.getInstance(ALGORITHM_SIMMETRIC);
     SecretKeySpec secretKey = new SecretKeySpec(key, ALGORITHM_SIMMETRIC);
@@ -127,7 +127,7 @@ public class MyCrypto {
    * @param cryptMessage зашифрованное сообщение из hex символов и возможно пробелов, табуляций, переводов строки
    * @return расшифрованное сообщение
    */
-  public String decrypt(String cryptMessage)
+  private String decrypt(String cryptMessage)
   {
     String otv = "<error decrypt> "; // ответ в случае ошибки раскодирования
     try {
@@ -177,7 +177,7 @@ public class MyCrypto {
    * @throws NoSuchAlgorithmException
    * @throws InvalidKeySpecException
    */
-  protected PublicKey restorePublic(String hexStr) throws NoSuchAlgorithmException, InvalidKeySpecException
+  private PublicKey restorePublic(String hexStr) throws NoSuchAlgorithmException, InvalidKeySpecException
   {
     KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
     byte[] b = hex2Byte(hexStr);    // сделаем, требуемый байтовый массив
@@ -377,9 +377,7 @@ public class MyCrypto {
       return null;
     }
     // случайный ключ сеанса
-    SecureRandom random = new SecureRandom();
-    byte[] seskey = new byte[ALGORITHM_SIMMETRIC_LENGTH];  // формируем сеансовый ключ
-    random.nextBytes(seskey);      // случайная последовательность
+    byte[] seskey = randomBytes(ALGORITHM_SIMMETRIC_LENGTH);  // формируем сеансовый ключ
     try {
       byte[] cryptSesKey = encryptRSA(seskey);  // зашифруем ключ - получим 128 байт
       byte[] cryptText   = encryptAES(seskey, hash_mess); // шифруем спец-сообщение
@@ -396,6 +394,31 @@ public class MyCrypto {
       return null;
     }
     return otvet;
+  }
+
+  /**
+   * случайная последовательность байт
+   * @param lenb  длина последовательности
+   * @return массив случайных байт
+   */
+  private byte[]  randomBytes(int lenb)
+  {
+    SecureRandom random = new SecureRandom();
+    byte[] rnd = new byte[lenb];
+    random.nextBytes(rnd);      // случайная последовательность
+    return rnd;
+  }
+
+  /**
+   * сформировать случайную строку на основе заданного количества байт
+   * @param lenb длина байт
+   * @return случайная строка
+   */
+  public String randomString(int lenb)
+  {
+    byte[] rnd = randomBytes(lenb);
+    String res = byte2Hex(rnd);    // перевести в HEX
+    return res;
   }
 
   /**
@@ -437,7 +460,7 @@ public class MyCrypto {
    * а затем расшифровав хэш-сумму(16 байт) + сообщение. После чего, сообщение проверить
    * на совпадение хэш-суммы (MD5).
    * @param cryptoData зашифрованные данные
-   * @return
+   * @return расшифрованные данные
    */
   public byte[] decryptBigData(byte[] cryptoData)
   {
@@ -483,7 +506,7 @@ public class MyCrypto {
    * а затем расшифровав хэш-сумму(16 байт) + сообщение. После чего, сообщение проверить
    * на совпадение хэш-суммы (MD5).
    * @param message зашифрованное соообщение
-   * @return
+   * @return расшифрованный текст
    */
   public String decryptText(String message)
   {

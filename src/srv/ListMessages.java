@@ -9,6 +9,7 @@
  */
 package srv;
 
+import ae.R;
 import org.json.JSONArray;
 
 import java.util.HashMap;
@@ -18,11 +19,16 @@ public class ListMessages extends ServerData {
 
   public int[] get(String uFrom, String uTo)
   {
+    String pwd = getPwd(uTo);
+    if(pwd == null) {
+      return null;
+    }
     HashMap<String,String> args = new HashMap<>();
     if(uFrom != null)
       args.put("from", uFrom);
     if(uTo != null)
       args.put("to", uTo);
+    args.put("pwd", pwd);
     //
     int[] ari;
     ari = super.postInt(sKey, args);
