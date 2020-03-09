@@ -56,6 +56,7 @@ public class R {
     final String create_tables =
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val TEXT);" +
         "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, pwd TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
+        "CREATE TABLE mess (im INT primary key, ufrom VARCHAR(32), uto VARCHAR(32), msg TEXT, datr DATETIME, wdat DATETIME);" +
         "INSERT INTO _Info(key,val) VALUES('Server','http://localhost/webcerera/srv/');" +
         "";
     if(db == null) {

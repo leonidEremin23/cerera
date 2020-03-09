@@ -74,6 +74,18 @@ public class Controller extends OutputStream implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    attachStdout();
+    //
+    initialRun();
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Перенаправление стандартного вывода в TextArea
+  // class ... extends OutputStream implements Initializable {
+  // стандартный вывод System.output направил в поле txt_out
+  // https://code-examples.net/ru/q/19a134d
+  private void attachStdout()
+  {
     OutputStream out = new OutputStream() {
       @Override
       public void write(int b) throws IOException {
@@ -105,10 +117,8 @@ public class Controller extends OutputStream implements Initializable {
         write(b, 0, b.length);
       }
     };
-//    System.setOut(new PrintStream(out, true));
-//    System.setErr(new PrintStream(err, true));
-    //
-    initialRun();
+    System.setOut(new PrintStream(out, true));
+    System.setErr(new PrintStream(err, true));
   }
 
   @Override
@@ -177,7 +187,7 @@ public class Controller extends OutputStream implements Initializable {
     String ufrom = txt_to.getText();
     String uto = txt_usr.getText();
     int[] ims;
-    ims = lm.get(ufrom, uto);
+    ims = lm.getInt(ufrom, uto);
     if(ims != null) {
       System.out.println(R.Now() + " ");
       for (int i1 : ims) {

@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ServerData {
@@ -133,6 +134,38 @@ public class ServerData {
       return  ar;
     }
     return null;
+  }
+
+  /**
+   * Послать запрос к серверу и получить список массивов строк
+   * ["номер", "отправитель", "получаталь", "дата"]
+   * @param key   ключ операции
+   * @param args  аргументы посылки
+   * @return true задача выполнена, false задача не выполнена
+   */
+  List<String[]> postList(String key, Map<String, String> args)
+  {
+    JSONArray ja = load(key, args);
+    if(ja == null)
+      return null;
+    ArrayList<String[]> alist = new ArrayList<>();
+    int n = ja.length();  // кол-во элементов списка
+    for(int i = 0; i < n; i++) {
+      String[] astr = null;
+      try {
+        JSONArray js = (JSONArray) ja.get(i); // массив строк
+        int jn = js.length();
+        astr = new String[jn];
+        for(int j = 0; j < jn; j++) {
+          String s = (String) js.get(j);
+          astr[j] = s;
+        }
+      } catch (Exception e) {
+        System.err.println("?-error-postList() ошибка преобразования типа: " + e.getMessage());
+      }
+      alist.add(astr);
+    }
+    return  alist;
   }
 
 

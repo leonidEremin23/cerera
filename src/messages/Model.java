@@ -104,7 +104,7 @@ class Model {
     }
     // получить список сообщений
     ListMessages lm = new ListMessages();
-    int[] nma = lm.get(usrFrom, usrTo);
+    int[] nma = lm.getInt(usrFrom, usrTo);
     if(nma != null && nma.length > 0) {
       // список есть
       int im = nma[0];  // номер первого в списке сообщения

@@ -59,8 +59,8 @@
          <Insets right="2.0" />
       </GridPane.margin></Button>
 
-    <TextArea fx:id="txt_output" editable="false" prefHeight="100" promptText="standart output" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-    <TextArea fx:id="txt_errout" editable="false" prefHeight="100" promptText="error output" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+    <TextArea fx:id="txt_output" editable="false" prefHeight="100" promptText="standart output" visible="true" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+    <TextArea fx:id="txt_errout" editable="false" prefHeight="100" promptText="error output" visible="true" GridPane.columnIndex="2" GridPane.rowIndex="7" />
 
     <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="2" GridPane.rowIndex="8">
       <GridPane.margin>
