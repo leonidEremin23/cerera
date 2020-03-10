@@ -5,35 +5,37 @@
  */
 /*
   Строка данных выводимая в таблицу входящих сообщений
+  индекс_сообщения, от_кого, дата
  */
-
 
 package senders;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Stroka {
-  private StringProperty  im;   // индекс сообщения
+
+  private SimpleIntegerProperty im;   // индекс сообщения
   private StringProperty  from; // отправитель
   private StringProperty  dat;  // дата сообщения
 
-  public Stroka(String im,String from, String dat)
+  public Stroka(Integer im,String from, String dat)
   {
-    this.im   = new SimpleStringProperty(im);
+    this.im   = new SimpleIntegerProperty(im);
     this.from = new SimpleStringProperty(from);
     this.dat  = new SimpleStringProperty(dat);
   }
 
-  public String getIm() {
+  public int getIm() {
     return im.get();
   }
 
-  public StringProperty imProperty() {
+  public SimpleIntegerProperty imProperty() {
     return im;
   }
 
-  public void setIm(String im) {
+  public void setIm(int im) {
     this.im.set(im);
   }
 

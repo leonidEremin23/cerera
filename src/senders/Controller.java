@@ -38,7 +38,9 @@ public class Controller implements Initializable {
   @FXML
   TableView<Stroka> tbl_senders;
   @FXML
-  private TableColumn<Stroka, String> col_im;
+  private TableColumn<Stroka, Number> col_im; // вместо Integer надо использовать Number!
+  // https://stackoverflow.com/a/56656665
+
   @FXML
   private TableColumn<Stroka, String> col_from;
   @FXML
@@ -48,7 +50,7 @@ public class Controller implements Initializable {
   TextArea  txt_message;
 
   @FXML
-  public TextField txt_from;
+  public TextField txt_adresat;
 
   @FXML
   public TextArea txt_send;
@@ -99,11 +101,14 @@ public class Controller implements Initializable {
 
   public void onclick_btn_send(ActionEvent ae)
   {
-    String uTo = txt_from.getText();
+    String uTo = txt_adresat.getText();
+    if (uTo == null || uTo.length() < 1) {
+      System.out.println(R.Now() + " адресат не указан");
+      return;
+    }
     String msg = txt_send.getText();
     boolean b;
     b = model.sendMessage(uTo, msg);
-    String otv;
     if(b)
       System.out.println(R.Now() + " сообщение отправлено");
     else
@@ -116,12 +121,12 @@ public class Controller implements Initializable {
     TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
     Stroka stro = selectionModel.getSelectedItem();
     if(stro != null) {
-      int im = Integer.parseInt(stro.getIm());
+      int im = stro.getIm();
       // System.out.println("test " + mind);
       String msg = model.getMsg(im);
       String ufr = model.getFrom(im);
       txt_message.setText(msg);
-      txt_from.setText(ufr);
+      txt_adresat.setText(ufr);
     }
   }
 
@@ -146,13 +151,14 @@ public class Controller implements Initializable {
     int n;
     n = model.loadNewMessages();
     if(n > 0) {
-      TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
-      Stroka stro = selectionModel.getSelectedItem();
-      String im = stro.getIm();
-
+//      TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
+//      Stroka stro = selectionModel.getSelectedItem();
+//      int im = 0;
+//      if (stro != null) im = stro.getIm();
+      //
       loadData();
       // выбрать после отображения
-      Platform.runLater(() -> selectRow(im));
+      Platform.runLater(() -> selectRow(0));
     }
   }
 
@@ -166,9 +172,20 @@ public class Controller implements Initializable {
     if(lst == null)
       return;
     for(String[] r: lst) {
-      usersData.add(new Stroka(r[0],r[1],r[2]));
+      Integer iii = Integer.parseInt(r[0]);
+      usersData.add(new Stroka(iii,r[1],r[2]));
     }
     //
+//    col_im.setCellValueFactory(cellData -> {
+//      return cellData.getValue().imProperty();
+//    });
+//
+//    col_im.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Stroka, Integer>, ObservableValue<Integer>>() {
+//      public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Stroka, Integer> p) {
+//        // p.getValue() returns the Person instance for a particular TableView row
+//        return p.getValue().imProperty();
+//      }
+//    });
     col_im.setCellValueFactory(cellData -> cellData.getValue().imProperty());
     col_from.setCellValueFactory(cellData -> cellData.getValue().fromProperty());
     col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
@@ -177,27 +194,33 @@ public class Controller implements Initializable {
   }
 
   /**
-   * выбрать строку с указанной строкой
-   * @param im
+   * выбрать строку с указанной строкой, если указан 0, то выделение на самой первой строке
+   * @param im индекс сообщения
    */
-  void selectRow(String im)
+  void selectRow(int im)
   {
+    boolean b;
+    b = txt_send.isFocused();
+    // если фокус ввода в поле набора сообщения, то ничего не делаем
+    if(b)
+      return;
     TableView.TableViewSelectionModel<Stroka> newselectionModel = tbl_senders.getSelectionModel();
     ObservableList<Stroka> odat = tbl_senders.getItems();
     int n = odat.size();
     for(int i = 0; i < n; i++) {
       Stroka stro = odat.get(i);
-      String imi = stro.getIm();
-      if(imi.contentEquals(im)) {
+      int imi = stro.getIm();
+      if(imi == im || im == 0) {
         newselectionModel.select(stro);
+        break;
       }
     }
 //    getModelItem(i)
 //    newselectionModel.select(stro);
   }
 
-  protected int count = 0;
-  // запуск таймера
+  private int count = 0;
+  // запуск таймера для обновления списка сообщений
   private void beginTimer()
   {
     Timeline timeline = new Timeline();
