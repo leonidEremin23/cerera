@@ -14,15 +14,12 @@ import ae.Database;
 import ae.R;
 import srv.ListMessages;
 import srv.Message;
-import srv.PubKey;
-import srv.UserList;
+import srv.SendMessage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 class Model {
-  private UserList mUserList = new UserList();  // список пользователей на сервере
   private Database mDb;
 
   Model()
@@ -31,102 +28,111 @@ class Model {
   }
 
   /**
-   * список пользователей локальной БД
-   * @return коллекция строк с именами пользователей
-   */
-  Collection<String> getUserNames()
-  {
-    ArrayList<String[]> ard;
-    ard = mDb.DlookupArray("SELECT usr FROM keys WHERE mykey!=1 ORDER BY usr");
-    ArrayList<String> list = new ArrayList<>();
-    for(String[] r: ard)
-      list.add(r[0]); // добавим имя в массив
-    return  list;
-  }
-
-  /**
-   * список сообщений для текущего пользователя
-   * @return
+   * список сообщений для текущего пользователя из локальной БД
+   * @return список данных [im, from, dat]
    */
   List<String[]> getMessagesList()
   {
     String  uTo = R.getUsr();
     if(uTo == null)
       return null;
+    // загрузим сообщения из локальной БД
+    String sql = "SELECT im,ufrom,wdat FROM mess WHERE uto='" + uTo +"' ORDER BY wdat DESC";
+    ArrayList<String[]> ars = mDb.DlookupArray(sql);
+    return ars;
+  }
+
+  /**
+   * загрузить новые сообщения для текущего пользователя и их текст в локальную таблицу
+   * @return кол-во загруженных сообщений
+   */
+  int loadNewMessages()
+  {
+    String  uTo = R.getUsr();
+    String  pwd = R.getUsrPwd(uTo);
+    if(pwd == null) {
+      return 0;
+    }
+    // получим список новых сообщений и загрузим их в БД
     ListMessages lm = new ListMessages();
     List<String[]> lst = lm.get(null, uTo);
-    return lst;
-  }
-
-  /**
-   * проверить пользователя в локальной БД
-   * @param username  имя пользователя
-   * @return true есть пользователь
-   */
-  boolean checkUserLocal(String username)
-  {
-    // 1) проверяем в локальной БД
-    String un;
-    un = mDb.Dlookup("SELECT count(*) FROM keys WHERE usr='" + username + "'");
-    if(un != null && Integer.parseInt(un) > 0)
-      return true;  // пользователь есть в локальной БД
-    return false;
-  }
-
-  /**
-   * проверить пользователя на сервере и если есть добавить его в локальную БД
-   * @param username  имя пользователя
-   * @return true есть пользователь, false - нет пользователя
-   */
-  boolean checkUserServer(String username)
-  {
-    // проверим на сервере
-    boolean b = mUserList.inList(username);
-    if(b) {
-      PubKey pk = new PubKey();
-      String pubkey = pk.get(username);
-      if(pubkey != null) {
-        // вставим в локальную БД
-        String sql;
-        mDb.ExecSql("DELETE FROM keys WHERE usr='" + username + "'");
-        sql = "INSERT INTO keys (usr,publickey) VALUES('" + username + "','" + pubkey + "')";
-        int a = mDb.ExecSql(sql);
-        if(a != 1) {
-          System.err.println("?-error-в табл. keys не добавлен пользователь: " + username);
-        } else {
-          return true;
-        }
-      } else {
-        System.err.println("?-error-на сервере нет публичного ключа у пользователя: " + username);
+    if(lst != null) {
+      for(String[] r: lst) {
+        String fmt = "INSERT INTO mess (im,ufrom,uto,wdat) VALUES('%s','%s','%s','%s')";
+        String sql = String.format(fmt, r[0],r[1],r[2],r[3]);
+        mDb.ExecSql(sql);
       }
     }
-    return false;
+    // загрузим текст новых сообщений в БД
+    String sql = "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uTo +"'";
+    ArrayList<String[]> ars = mDb.DlookupArray(sql);
+    int cnt = 0;
+    for(String[] r: ars) {
+      Integer im = Integer.parseInt(r[0]);
+      Message ms = new Message();
+      String msg = ms.get(uTo, im);
+      if(msg != null) {
+        String imsg = mDb.s2s(msg);
+        String isql = "UPDATE mess SET msg =" + imsg + " WHERE im=" + im;
+        mDb.ExecSql(isql);
+        cnt++;
+      }
+    }
+    return cnt;
   }
 
+  boolean sendMessage(String uTo, String textMsg)
+  {
+    SendMessage sm = new SendMessage();
+    return sm.post(uTo, textMsg);
+  }
 
   /**
-   * получить сообщение для текущего от пользователя
-   * @param usrFrom имя пользователя
+   * получить текст сообщения
+   * @param im  индекс сообщения
    * @return текст сообщения
    */
-  String  getMessage(String usrFrom)
+  String  getMsg(int im)
   {
-    String usrTo = R.getUsr();
-    if(usrTo == null) {
-      System.err.println("?-error-не задан текущий пользователь");
-      return null;
-    }
-    // получить список сообщений
-    ListMessages lm = new ListMessages();
-    int[] nma = lm.getInt(usrFrom, usrTo);
-    if(nma != null && nma.length > 0) {
-      // список есть
-      int im = nma[0];  // номер первого в списке сообщения
-      Message ms = new Message();
-      String msg = ms.get(usrTo, im);
-      return msg;
-    }
-    return null;
+    return getFldMess(im, "msg");
+  }
+
+  /**
+   * получить отправителя сообщения
+   * @param im  индекс сообщения
+   * @return имя отправителя
+   */
+  String  getFrom(int im)
+  {
+    return getFldMess(im, "ufrom");
+  }
+
+  /**
+   * вернуть значени е поля заданного сообщения
+   * @param im      индекс сообщения
+   * @param fldName имя поля
+   * @return  содержимое поля или '?'
+   */
+  String getFldMess(int im, String fldName)
+  {
+    String sql = "SELECT " + fldName + " FROM mess WHERE im=" + im;
+    String msg = mDb.Dlookup(sql);
+    if(msg == null)
+      msg = "?";
+    return msg;
+  }
+
+  /**
+   * вернуть значени е поля заданного сообщения
+   * @param im      индекс сообщения
+   * @param fldName имя поля
+   * @return  содержимое поля или '?'
+   */
+  String getFldKeys(String usr, String fldName)
+  {
+    String sql = "SELECT " + fldName + " FROM keys WHERE usr='" + usr + "'";
+    String msg = mDb.Dlookup(sql);
+    return msg;
   }
 
 } // end of class

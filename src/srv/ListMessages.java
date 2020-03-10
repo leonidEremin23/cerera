@@ -15,8 +15,8 @@ package srv;
 
 import ae.R;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ListMessages extends ServerData {
   private final static String sKey = "listmessages";  // ключ метки
@@ -52,35 +52,20 @@ public class ListMessages extends ServerData {
    */
   public List<String[]> get(String uFrom, String uTo)
   {
-    HashMap<String,String> args = prepareArgs(uFrom, uTo);
+    String pwd = R.getUsrPwd(uTo);
+    if(pwd == null) {
+      return null;
+    }
+    Map<String,String> args = prepareArgs(
+        "from", uFrom,
+        "to",   uTo,
+        "pwd",  pwd
+    );
     if(args == null)
       return null;
     List<String[]> ars;
     ars = super.postList(sKey, args);
     return ars;
   }
-
-  /**
-   * подготовить аргументы запроса с учетом пароля получателя
-   * @param uFrom отправитель
-   * @param uTo   получатель
-   * @return массив аргументов для запроса
-   */
-  private HashMap<String,String> prepareArgs(String uFrom, String uTo)
-  {
-    String pwd = R.getUsrPwd(uTo);
-    if(pwd == null) {
-      return null;
-    }
-    HashMap<String,String> args = new HashMap<>();
-    if(uFrom != null)
-      args.put("from", uFrom);
-    if(uTo != null)
-      args.put("to", uTo);
-    args.put("pwd", pwd);
-    //
-    return args;
-  }
-
 
 } // end of class

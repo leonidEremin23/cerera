@@ -7,8 +7,8 @@
 /*
    Базовый класс по чтению данных с сервера
    данные передаются как JSON объект с полями
-    "metka" значение - строка "cerera#имяключа"
-    "array" значение - массив данных
+    "result" значение - логическое
+    "data" значение   - массив данных
  */
 
 package srv;
@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,7 @@ public class ServerData {
    * @param args  аргументы посылки
    * @return true задача выполнена, false задача не выполнена
    */
-  boolean post(String key, Map<String, String> args)
+  boolean post(String key, Map<String,String> args)
   {
     JSONArray ja = load(key, args);
     if(ja != null) {
@@ -87,7 +88,7 @@ public class ServerData {
    * @param args  аргументы посылки
    * @return true задача выполнена, false задача не выполнена
    */
-  String[] postStr(String key, Map<String, String> args)
+  String[] postStr(String key, Map<String,String> args)
   {
     JSONArray ja = load(key, args);
     if(ja != null) {
@@ -116,7 +117,7 @@ public class ServerData {
    * @param args  аргументы посылки
    * @return true задача выполнена, false задача не выполнена
    */
-  int[] postInt(String key, Map<String, String> args)
+  int[] postInt(String key, Map<String,String> args)
   {
     JSONArray ja = load(key, args);
     if(ja != null) {
@@ -143,7 +144,7 @@ public class ServerData {
    * @param args  аргументы посылки
    * @return true задача выполнена, false задача не выполнена
    */
-  List<String[]> postList(String key, Map<String, String> args)
+  List<String[]> postList(String key, Map<String,String> args)
   {
     JSONArray ja = load(key, args);
     if(ja == null)
@@ -168,5 +169,27 @@ public class ServerData {
     return  alist;
   }
 
+  /**
+   * подготовить аргументы запроса из пар строк: имя,значение
+   * @param arg  пары: имя,значение
+   * @return массив аргументов для запроса
+   */
+  Map<String,String> prepareArgs(String ... arg)
+  {
+    int n = arg.length;   // общее кол-во аргументов
+    if(n < 2 || (n%2) != 0) {
+      System.err.println("?-error-prepareArgs() неверное кол-во аргументов");
+      return null;
+    }
+    Map<String,String> args = new HashMap<>();
+    for(int i = 0; i < n; ) {
+      String nam = arg[i++];  // имя аргумента
+      String val = arg[i++];  // значение параметра
+      if(nam != null && val != null) {
+        args.put(nam, val);
+      }
+    }
+    return args;
+  }
 
 } // end of class

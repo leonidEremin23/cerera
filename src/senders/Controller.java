@@ -11,6 +11,9 @@
 package senders;
 
 import ae.R;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,14 +21,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import srv.ListMessages;
-import srv.SendMessage;
+import javafx.util.Duration;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -53,13 +51,16 @@ public class Controller implements Initializable {
   public TextField txt_from;
 
   @FXML
-  public TextArea txt_receive;
+  public TextArea txt_send;
+
+  @FXML
+  Button  btn_request;
+
+  @FXML
+  Button btn_message;
 
   @FXML
   Button btn_send;
-
-  @FXML
-  Button btn_receive;
 
   @FXML
   Button    btn_register;
@@ -68,9 +69,9 @@ public class Controller implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-
     // attachStdout();
     initialRun();
+    beginTimer();
   }
 
   /**
@@ -83,35 +84,45 @@ public class Controller implements Initializable {
 //    cmb_users.getSelectionModel().select(0);
     //
     txt_usr.setText(R.getUsr());
+    //
+    // создать слушателя событие в таблице
+    tbl_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+      if (newSelection != null) {
+        onclick_btn_message(null);
+      }
+    });
+    //
+    // загрузить данные о сообщениях
+    loadData();
   }
 
 
   public void onclick_btn_send(ActionEvent ae)
   {
-//    String  un = R.trimWS(txt_to.getText());  // получить имя получателя
-//    txt_to.setText(un); // запишем на всякий случай, без пробелов
-//    //
-//    if(!model.checkUserLocal(un)) {
-//      if(!model.checkUserServer(un)) {
-//        System.err.println("?-error-нет пользователя: " + un);
-//        return;
-//      } else {
-//        loadUsers();  // перезагрузить пользователей
-//      }
-//    }
-//    SendMessage sm = new SendMessage();
-//    boolean b;
-//    String msg = txt_message.getText();
-//    b = sm.post(un, msg);
-//    if(b) {
-//      System.out.println(R.Now() + " сообщение отправлено");
-//    }
+    String uTo = txt_from.getText();
+    String msg = txt_send.getText();
+    boolean b;
+    b = model.sendMessage(uTo, msg);
+    String otv;
+    if(b)
+      System.out.println(R.Now() + " сообщение отправлено");
+    else
+      System.err.println(R.Now() + " ошибка отправки сообщения");
   }
 
-  public void onclick_btn_receive(ActionEvent ae)
+
+  public void onclick_btn_message(ActionEvent ae)
   {
-    //
-    loadData();
+    TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
+    Stroka stro = selectionModel.getSelectedItem();
+    if(stro != null) {
+      int im = Integer.parseInt(stro.getIm());
+      // System.out.println("test " + mind);
+      String msg = model.getMsg(im);
+      String ufr = model.getFrom(im);
+      txt_message.setText(msg);
+      txt_from.setText(ufr);
+    }
   }
 
   /**
@@ -127,6 +138,25 @@ public class Controller implements Initializable {
   }
 
   /**
+   * опрос сервера
+   * @param ae событие
+   */
+  public void onclick_btn_request(ActionEvent ae)
+  {
+    int n;
+    n = model.loadNewMessages();
+    if(n > 0) {
+      TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
+      Stroka stro = selectionModel.getSelectedItem();
+      String im = stro.getIm();
+
+      loadData();
+      // выбрать после отображения
+      Platform.runLater(() -> selectRow(im));
+    }
+  }
+
+  /**
    * загрузить таблицу данными
    */
   private void  loadData()
@@ -136,7 +166,7 @@ public class Controller implements Initializable {
     if(lst == null)
       return;
     for(String[] r: lst) {
-      usersData.add(new Stroka(r[0],r[1],r[3]));
+      usersData.add(new Stroka(r[0],r[1],r[2]));
     }
     //
     col_im.setCellValueFactory(cellData -> cellData.getValue().imProperty());
@@ -144,6 +174,47 @@ public class Controller implements Initializable {
     col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
     // заполняем таблицу данными
     tbl_senders.setItems(usersData);
+  }
+
+  /**
+   * выбрать строку с указанной строкой
+   * @param im
+   */
+  void selectRow(String im)
+  {
+    TableView.TableViewSelectionModel<Stroka> newselectionModel = tbl_senders.getSelectionModel();
+    ObservableList<Stroka> odat = tbl_senders.getItems();
+    int n = odat.size();
+    for(int i = 0; i < n; i++) {
+      Stroka stro = odat.get(i);
+      String imi = stro.getIm();
+      if(imi.contentEquals(im)) {
+        newselectionModel.select(stro);
+      }
+    }
+//    getModelItem(i)
+//    newselectionModel.select(stro);
+  }
+
+  protected int count = 0;
+  // запуск таймера
+  private void beginTimer()
+  {
+    Timeline timeline = new Timeline();
+    timeline.setCycleCount(Animation.INDEFINITE);
+    KeyFrame keyFrame = new KeyFrame(
+        Duration.seconds(5),
+        event -> {
+          // https://issue.life/questions/53587355
+          //txt_send.setText(String.valueOf(count++));
+          count++;
+          // обновить данные с сервера
+          onclick_btn_request(null);
+        }
+    );
+    timeline.getKeyFrames().add(keyFrame);
+    System.out.println("TimeLine thread id "+ Thread.currentThread().getId());
+    timeline.play();
   }
 
 } // end of class

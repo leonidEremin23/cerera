@@ -10,6 +10,7 @@
 package srv;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterUser extends ServerData {
   private final static String sKey = "registeruser";  // ключ метки
@@ -23,10 +24,11 @@ public class RegisterUser extends ServerData {
    */
   public boolean  post(String usr, String pubkey, String pwd)
   {
-    HashMap<String,String> args = new HashMap<>();
-    args.put("usr", usr);
-    args.put("pubkey", pubkey);
-    args.put("pwd", pwd);
+    Map<String,String> args = prepareArgs(
+        "usr",    usr,
+        "pubkey", pubkey,
+        "pwd",    pwd
+    );
     boolean b;
     b = super.post(sKey, args);
     return b;

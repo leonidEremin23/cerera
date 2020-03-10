@@ -13,6 +13,7 @@ import ae.MyCrypto;
 import ae.R;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Message extends ServerData
 {
@@ -28,10 +29,10 @@ public class Message extends ServerData
   {
     String pwd = R.getUsrPwd(uTo);
     if(pwd != null) {
-      HashMap<String, String> args = new HashMap<>();
-      args.put("im",  String.valueOf(im));
-      args.put("pwd", pwd);
-      //
+      Map<String, String> args = prepareArgs(
+          "im", String.valueOf(im),
+          "pwd", pwd
+      );
       String[] ars;
       ars = super.postStr(sKey, args);
       if(ars != null && ars.length >=4) {

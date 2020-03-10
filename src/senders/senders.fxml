@@ -23,14 +23,14 @@
       <GridPane.margin>
          <Insets left="4.0" right="4.0" />
       </GridPane.margin></Label>
-    <Label prefHeight="22.0" text="новые сообщения" GridPane.columnIndex="1" GridPane.rowIndex="2">
+    <Label prefHeight="22.0" text="сообщения" GridPane.columnIndex="1" GridPane.rowIndex="2">
       <opaqueInsets>
          <Insets />
       </opaqueInsets>
       <GridPane.margin>
          <Insets left="4.0" right="4.0" />
       </GridPane.margin></Label>
-    <Label prefHeight="22.0" text="передача" GridPane.columnIndex="1" GridPane.rowIndex="3">
+    <Label prefHeight="22.0" text="текст" GridPane.columnIndex="1" GridPane.rowIndex="3">
       <GridPane.margin>
          <Insets left="4.0" />
       </GridPane.margin></Label>
@@ -38,7 +38,7 @@
       <GridPane.margin>
          <Insets left="4.0" />
       </GridPane.margin></Label>
-    <Label prefHeight="22.0" text="прием" GridPane.columnIndex="1" GridPane.rowIndex="5">
+    <Label prefHeight="22.0" text="сообщение" GridPane.columnIndex="1" GridPane.rowIndex="5">
       <GridPane.margin>
          <Insets left="4.0" />
       </GridPane.margin></Label>
@@ -57,17 +57,25 @@
         
     </TableView>
 
-    <TextArea fx:id="txt_message" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-    <Button fx:id="btn_send" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_send" text="Отправить" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-      <GridPane.margin>
-         <Insets right="2.0" />
-      </GridPane.margin></Button>
+    <Button fx:id="btn_request" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_request" text="опрос" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+        <GridPane.margin>
+            <Insets right="2.0" />
+        </GridPane.margin>
+    </Button>
 
-    <TextField fx:id="txt_from" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-    <TextArea fx:id="txt_receive" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-    <Button fx:id="btn_receive" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_receive" text="Принять" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+    <TextArea fx:id="txt_message" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+    <Button fx:id="btn_message" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_message" text="сообщение" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
       <GridPane.margin>
-         <Insets right="2.0" />
+          <Insets left="2.0" right="2.0" />
+      </GridPane.margin>
+    </Button>
+
+    <TextField fx:id="txt_from" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+
+    <TextArea fx:id="txt_send" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+    <Button fx:id="btn_send" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_send" text="Отправить" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+      <GridPane.margin>
+         <Insets left="2" right="2.0" />
       </GridPane.margin></Button>
 
     <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="2" GridPane.rowIndex="8">

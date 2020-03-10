@@ -70,9 +70,9 @@ public class Controller implements Initializable {
     ta_publicKey.setText(keys[0]);
     ta_privateKey.setText(keys[1]);
     String usr =  txt_user.getText();   // получим имя пользователя
-    //model.rememberKeys(keys[0],keys[1]);
+    String busr = R.trimWS(usr.replace("'", "`"));  // имя без апострофов и пробелов
     boolean res;
-    res = model.addUser(usr, keys[0], keys[1], keys[2]);
+    res = model.addUser(busr, keys[0], keys[1], keys[2]);
     if(!res) {
       String errMess = "Ошибка добавления пользователя " + usr + " / " + model.getLastError();
       ta_privateKey.setText(errMess);

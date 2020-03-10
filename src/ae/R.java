@@ -488,7 +488,7 @@ public class R {
   {
     String key = getStrField(usr, "publickey");
     if(key == null) {
-      System.err.println("?-error-getUsrPublickey() нет открытого ключа пользователя: " + usr);
+      System.err.println("?-error-getUsrPublickey() нет публичного ключа пользователя: " + usr);
       return null;
     }
     return key;
