@@ -112,7 +112,6 @@ public class Controller implements Initializable {
   {
     //
     loadData();
-
   }
 
   /**
