@@ -23,12 +23,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 
-public class Controller implements Initializable {
+public class Controller extends OutputStream implements Initializable {
 
   private Model model = new Model();
 
@@ -67,13 +70,15 @@ public class Controller implements Initializable {
   @FXML
   Button    btn_register;
 
+  @FXML
+  TextArea  txt_stdout;
+
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    // attachStdout();
     initialRun();
-    beginTimer();
+    attachStdout();
   }
 
   /**
@@ -81,13 +86,10 @@ public class Controller implements Initializable {
    */
   private void initialRun()
   {
-    // заполним список пользователей про которых у нас есть ключи
-//    loadUsers();
-//    cmb_users.getSelectionModel().select(0);
     //
     txt_usr.setText(R.getUsr());
     //
-    // создать слушателя событие в таблице
+    // создать слушателя события в таблице
     tbl_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
       if (newSelection != null) {
         onclick_btn_message(null);
@@ -96,9 +98,15 @@ public class Controller implements Initializable {
     //
     // загрузить данные о сообщениях
     loadData();
+    //
+    beginTimer(); // запустить таймер опроса сервера
+    //
   }
 
-
+  /**
+   * отправить сообщение адресату
+   * @param ae событие
+   */
   public void onclick_btn_send(ActionEvent ae)
   {
     String uTo = txt_adresat.getText();
@@ -106,6 +114,9 @@ public class Controller implements Initializable {
       System.out.println(R.Now() + " адресат не указан");
       return;
     }
+    uTo = R.trimWS(uTo);  // удалить пробелы и апострофы
+    txt_adresat.setText(uTo);
+    //
     String msg = txt_send.getText();
     boolean b;
     b = model.sendMessage(uTo, msg);
@@ -116,6 +127,10 @@ public class Controller implements Initializable {
   }
 
 
+  /**
+   * прочитать данные о сообщении, выбранном в таблице
+   * @param ae  событие
+   */
   public void onclick_btn_message(ActionEvent ae)
   {
     TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
@@ -176,16 +191,6 @@ public class Controller implements Initializable {
       usersData.add(new Stroka(iii,r[1],r[2]));
     }
     //
-//    col_im.setCellValueFactory(cellData -> {
-//      return cellData.getValue().imProperty();
-//    });
-//
-//    col_im.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Stroka, Integer>, ObservableValue<Integer>>() {
-//      public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Stroka, Integer> p) {
-//        // p.getValue() returns the Person instance for a particular TableView row
-//        return p.getValue().imProperty();
-//      }
-//    });
     col_im.setCellValueFactory(cellData -> cellData.getValue().imProperty());
     col_from.setCellValueFactory(cellData -> cellData.getValue().fromProperty());
     col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
@@ -194,16 +199,15 @@ public class Controller implements Initializable {
   }
 
   /**
-   * выбрать строку с указанной строкой, если указан 0, то выделение на самой первой строке
+   * выбрать строку таблицы с указанным индексом сообщения,
+   * если указан 0, то выделение на самой первой строке
    * @param im индекс сообщения
    */
-  void selectRow(int im)
+  private void selectRow(int im)
   {
-    boolean b;
-    b = txt_send.isFocused();
     // если фокус ввода в поле набора сообщения, то ничего не делаем
-    if(b)
-      return;
+    boolean b = txt_send.isFocused();
+    if(b) return;
     TableView.TableViewSelectionModel<Stroka> newselectionModel = tbl_senders.getSelectionModel();
     ObservableList<Stroka> odat = tbl_senders.getItems();
     int n = odat.size();
@@ -226,7 +230,7 @@ public class Controller implements Initializable {
     Timeline timeline = new Timeline();
     timeline.setCycleCount(Animation.INDEFINITE);
     KeyFrame keyFrame = new KeyFrame(
-        Duration.seconds(5),
+        Duration.seconds(10),
         event -> {
           // https://issue.life/questions/53587355
           //txt_send.setText(String.valueOf(count++));
@@ -238,6 +242,41 @@ public class Controller implements Initializable {
     timeline.getKeyFrames().add(keyFrame);
     System.out.println("TimeLine thread id "+ Thread.currentThread().getId());
     timeline.play();
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Перенаправление стандартного вывода в TextArea
+  // class ... extends OutputStream implements Initializable {
+  // стандартный вывод System.output направил в поле txt_out
+  // https://code-examples.net/ru/q/19a134d
+  private void attachStdout()
+  {
+    OutputStream out = new OutputStream() {
+      @Override
+      public void write(int b) throws IOException {
+        appendText(String.valueOf((char) b));
+      }
+      @Override
+      public void write(byte[] b, int off, int len) throws IOException {
+        appendText(new String(b, off, len));
+      }
+
+      @Override
+      public void write(byte[] b) throws IOException {
+        write(b, 0, b.length);
+      }
+    };
+    //
+    System.setOut(new PrintStream(out, true));
+  }
+
+  private void appendText(String str) {
+    Platform.runLater(() -> txt_stdout.appendText(str));
+  }
+
+  @Override
+  public void write(int b) throws IOException {
+    Platform.runLater(() -> txt_stdout.appendText(""+b));
   }
 
 } // end of class

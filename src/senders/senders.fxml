@@ -63,7 +63,7 @@
         </GridPane.margin>
     </Button>
 
-    <TextArea fx:id="txt_message" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+    <TextArea fx:id="txt_message" editable="false" prefHeight="100" GridPane.columnIndex="2" GridPane.rowIndex="3" />
     <Button fx:id="btn_message" alignment="CENTER" mnemonicParsing="false" onAction="#onclick_btn_message" text="сообщение" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
       <GridPane.margin>
           <Insets left="2.0" right="2.0" />
@@ -78,7 +78,9 @@
          <Insets left="2" right="2.0" />
       </GridPane.margin></Button>
 
-    <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="2" GridPane.rowIndex="8">
+    <TextArea fx:id="txt_stdout" prefHeight="80.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="8" />
+
+    <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.columnIndex="2" GridPane.rowIndex="9">
       <GridPane.margin>
          <Insets bottom="4.0" top="4.0" />
       </GridPane.margin></Button>
@@ -89,6 +91,7 @@
       <ColumnConstraints />
    </columnConstraints>
    <rowConstraints>
+      <RowConstraints />
       <RowConstraints />
       <RowConstraints />
       <RowConstraints />

@@ -14,6 +14,7 @@ import ae.Database;
 import ae.R;
 import srv.ListMessages;
 import srv.Message;
+import srv.PubKey;
 import srv.SendMessage;
 
 import java.util.ArrayList;
@@ -83,8 +84,55 @@ class Model {
 
   boolean sendMessage(String uTo, String textMsg)
   {
+    boolean b;
+    // проверим публичный ключ, а если нет, то запросим с сервера
+    b = isPublickey(uTo);
+    if(!b)
+      return false;
     SendMessage sm = new SendMessage();
-    return sm.post(uTo, textMsg);
+    b = sm.post(uTo, textMsg);
+    if(b) {
+      // запишем в локальную БД сообщение
+      String si = mDb.Dlookup("SELECT MIN(im) FROM mess");
+      if(null == si) si ="0";
+      int im = Integer.parseInt(si);
+      if(im > 0) im = 0;
+      im--;
+      String sql = "INSERT INTO mess(im,ufrom,uto,msg,wdat) VALUES(" + im + ","
+          + "'" + R.getUsr()       + "',"
+          + "'" + uTo              + "',"
+          +       mDb.s2s(textMsg) + ","
+          + "'" + R.Now("yyyy-MM-dd HH:mm:ss") + "')";
+      mDb.ExecSql(sql);
+    }
+    return b;
+  }
+
+  /**
+   * проверить публичный ключ пользователя в локальной БД,
+   * а если его нет, то попытатсья загрузить его из сервера
+   * @param usr пользователь
+   * @return true есть публичный ключ, fasle нет ключа
+   */
+  private boolean isPublickey(String usr)
+  {
+
+    String pubkey = getFldKeys(usr, "publickey");
+    if(pubkey == null || pubkey.length() < 16) {
+      PubKey pk = new PubKey();
+      String publickey = pk.get(usr);
+      if(publickey == null || publickey.length() < 16) {
+        System.out.println(R.Now() + " на сервере нет публичного ключа пользователя: " + usr);
+        return false;
+      }
+      mDb.ExecSql("DELETE FROM keys WHERE usr ='" + usr + "'");
+      String sql;
+      sql = "INSERT INTO keys (usr,publickey) VALUES ('" + usr + "','" + publickey + "')";
+      int a;
+      a = mDb.ExecSql(sql);
+      return (a==1);
+    }
+    return true;
   }
 
   /**
@@ -123,8 +171,8 @@ class Model {
   }
 
   /**
-   * вернуть значени е поля заданного сообщения
-   * @param im      индекс сообщения
+   * вернуть значение поля заданного пользователя
+   * @param usr     пользователь
    * @param fldName имя поля
    * @return  содержимое поля или '?'
    */

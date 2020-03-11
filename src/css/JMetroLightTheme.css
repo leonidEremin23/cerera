@@ -708,3 +708,19 @@
     -fx-text-fill: #158b16;
     -fx-background-color: #d4e9f3;
 }
+
+#txt_adresat {
+    -fx-font-size: 10pt;
+    -fx-font-weight: bold;
+    -fx-text-fill: #39596c;
+    -fx-background-color: #f3eebe;
+}
+
+#txt_stdout {
+    -fx-font-family: Consolas;
+    -fx-text-fill: green;
+}
+/* зададим фон для конкретного поля */
+#txt_stdout .content {
+    -fx-background-color: #d6ecb7;
+}

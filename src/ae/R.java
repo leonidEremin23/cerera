@@ -419,16 +419,17 @@ public class R {
   }
 
   /**
-   * вернуть строку без пробелов
+   * вернуть строку без пробелов и апострофов
    * @param str входная строка
-   * @return строка без пробелов
+   * @return строка без пробелов и апострофов
    */
   public static String  trimWS(String str)
   {
     if(null == str)
       return null;
     String s = str.replaceAll("\\s","");
-    return s;
+    String t = s.replaceAll("'","`");
+    return t;
   }
 
   /**
@@ -487,10 +488,8 @@ public class R {
   public static String getUsrPublickey(String usr)
   {
     String key = getStrField(usr, "publickey");
-    if(key == null) {
-      System.err.println("?-error-getUsrPublickey() нет публичного ключа пользователя: " + usr);
+    if(key == null)
       return null;
-    }
     return key;
   }
 
@@ -502,10 +501,8 @@ public class R {
   public static String getUsrPrivatekey(String usr)
   {
     String key = getStrField(usr, "privatekey");
-    if(key == null) {
-      System.err.println("?-error-getUsrPublickey() нет приватного ключа пользователя: " + usr);
+    if(key == null)
       return null;
-    }
     return key;
   }
 
@@ -518,9 +515,8 @@ public class R {
   private static String getStrField(String usr, String fld)
   {
     String s = getDb().Dlookup("SELECT " + fld + " FROM keys WHERE usr='" + usr + "'");
-    if(s == null || s.length() < 1) {
+    if(s == null || s.length() < 1)
       return null;
-    }
     return s;
   }
 

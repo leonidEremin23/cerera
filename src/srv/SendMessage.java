@@ -19,7 +19,7 @@ public class SendMessage extends ServerData {
   private final static String sKey = "send";  // ключ метки
 
   /**
-   * послать новое сообщение
+   * послать новое сообщение, зашифровав его
    * @param usrTo   имя получателя
    * @param msg     текст сообщения
    * @return true - сообщение отправлено, false - ошибка
@@ -27,7 +27,6 @@ public class SendMessage extends ServerData {
   public boolean  post(String usrTo, String msg)
   {
     String usrFrom = R.getUsr(); // отправитель
-    Database db = R.getDb();  // база данных
     // зашифруем сообщение
     String pubkey = R.getUsrPublickey(usrTo);
     String pwd = R.getUsrPwd(usrFrom);
