@@ -8,7 +8,7 @@
   индекс_сообщения, от_кого, дата
  */
 
-package senders;
+package messages;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;

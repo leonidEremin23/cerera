@@ -1,32 +1,33 @@
 /*
  * Copyright (c) 2020. Eremin
- * 01.03.20 15:28
+ * 09.03.20 15:44
  *
  */
 
 /*
-   Контролер отправки и получения сообщений
+   Контролер списка отправителей сообщений через web-сервер
  */
 
 package messages;
 
 import ae.R;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import srv.ListMessages;
-import srv.SendMessage;
+import javafx.scene.control.*;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
-import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -38,45 +39,209 @@ public class Controller extends OutputStream implements Initializable {
   TextField txt_usr;
 
   @FXML
-  TextField txt_to;
+  TableView<Stroka> tbl_senders;
+  @FXML
+  private TableColumn<Stroka, Number> col_im; // вместо Integer надо использовать Number!
+  // https://stackoverflow.com/a/56656665
 
   @FXML
-  ComboBox<String>  cmb_users;
+  private TableColumn<Stroka, String> col_from;
+  @FXML
+  private TableColumn<Stroka, String> col_dat;
 
   @FXML
   TextArea  txt_message;
 
   @FXML
-  public TextField txt_from;
+  public TextField txt_adresat;
 
   @FXML
-  public TextArea txt_receive;
+  public TextArea txt_send;
+
+  @FXML
+  Button  btn_request;
+
+  @FXML
+  Button btn_message;
 
   @FXML
   Button btn_send;
 
   @FXML
-  Button btn_receive;
-
-  @FXML
   Button    btn_register;
 
   @FXML
-  TextArea  txt_output; // вывод выходного потока стандартный
-  @FXML
-  TextArea  txt_errout; // вывод выходного потока ошибок
+  TextArea  txt_stdout;
 
-  ///////////////////////////////////////////////////////////////////
-  // Перенаправление стандартного вывода в TextArea
-  // class ... extends OutputStream implements Initializable {
-  // стандартный вывод System.output направил в поле txt_out
-  // https://code-examples.net/ru/q/19a134d
+  private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    attachStdout();
-    //
     initialRun();
+    attachStdout();
+  }
+
+  /**
+   * Метод вызывается при инициализации контролера
+   */
+  private void initialRun()
+  {
+    //
+    txt_usr.setText(R.getUsr());
+    //
+    // создать слушателя события в таблице
+    tbl_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+      if (newSelection != null) {
+        onclick_btn_message(null);
+      }
+    });
+    //
+    // загрузить данные о сообщениях
+    loadData();
+    //
+    beginTimer(); // запустить таймер опроса сервера
+    //
+  }
+
+  /**
+   * отправить сообщение адресату
+   * @param ae событие
+   */
+  public void onclick_btn_send(ActionEvent ae)
+  {
+    String uTo = txt_adresat.getText();
+    if (uTo == null || uTo.length() < 1) {
+      System.out.println(R.Now() + " адресат не указан");
+      return;
+    }
+    uTo = R.trimWS(uTo);  // удалить пробелы и апострофы
+    txt_adresat.setText(uTo);
+    //
+    String msg = txt_send.getText();
+    boolean b;
+    b = model.sendMessage(uTo, msg);
+    if(b)
+      System.out.println(R.Now() + " сообщение отправлено");
+    else
+      System.err.println(R.Now() + " ошибка отправки сообщения");
+  }
+
+
+  /**
+   * прочитать данные о сообщении, выбранном в таблице
+   * @param ae  событие
+   */
+  public void onclick_btn_message(ActionEvent ae)
+  {
+    TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
+    Stroka stro = selectionModel.getSelectedItem();
+    if(stro != null) {
+      int im = stro.getIm();
+      // System.out.println("test " + mind);
+      String msg = model.getMsg(im);
+      String ufr = model.getFrom(im);
+      txt_message.setText(msg);
+      txt_adresat.setText(ufr);
+    }
+  }
+
+  /**
+   * регистрация нового пользователя
+   * @param ae событие
+   */
+  public void onclick_btn_register(ActionEvent ae)
+  {
+    keygenmy.Dialog dialog = new keygenmy.Dialog();
+    dialog.open(ae);
+    //
+    txt_usr.setText(R.getUsr());
+  }
+
+  /**
+   * опрос сервера
+   * @param ae событие
+   */
+  public void onclick_btn_request(ActionEvent ae)
+  {
+    int n;
+    n = model.loadNewMessages();
+    if(n > 0) {
+//      TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
+//      Stroka stro = selectionModel.getSelectedItem();
+//      int im = 0;
+//      if (stro != null) im = stro.getIm();
+      //
+      loadData();
+      // выбрать после отображения
+      Platform.runLater(() -> selectRow(0));
+    }
+  }
+
+  /**
+   * загрузить таблицу данными
+   */
+  private void  loadData()
+  {
+    usersData.clear();  // очистить таблицу от данных
+    List<String[]> lst = model.getMessagesList();
+    if(lst == null)
+      return;
+    for(String[] r: lst) {
+      Integer iii = Integer.parseInt(r[0]);
+      usersData.add(new Stroka(iii,r[1],r[2]));
+    }
+    //
+    col_im.setCellValueFactory(cellData -> cellData.getValue().imProperty());
+    col_from.setCellValueFactory(cellData -> cellData.getValue().fromProperty());
+    col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
+    // заполняем таблицу данными
+    tbl_senders.setItems(usersData);
+  }
+
+  /**
+   * выбрать строку таблицы с указанным индексом сообщения,
+   * если указан 0, то выделение на самой первой строке
+   * @param im индекс сообщения
+   */
+  private void selectRow(int im)
+  {
+    // если фокус ввода в поле набора сообщения, то ничего не делаем
+    boolean b = txt_send.isFocused();
+    if(b) return;
+    TableView.TableViewSelectionModel<Stroka> newselectionModel = tbl_senders.getSelectionModel();
+    ObservableList<Stroka> odat = tbl_senders.getItems();
+    int n = odat.size();
+    for(int i = 0; i < n; i++) {
+      Stroka stro = odat.get(i);
+      int imi = stro.getIm();
+      if(imi == im || im == 0) {
+        newselectionModel.select(stro);
+        break;
+      }
+    }
+//    getModelItem(i)
+//    newselectionModel.select(stro);
+  }
+
+  private int count = 0;
+  // запуск таймера для обновления списка сообщений
+  private void beginTimer()
+  {
+    Timeline timeline = new Timeline();
+    timeline.setCycleCount(Animation.INDEFINITE);
+    KeyFrame keyFrame = new KeyFrame(
+        Duration.seconds(10),
+        event -> {
+          // https://issue.life/questions/53587355
+          //txt_send.setText(String.valueOf(count++));
+          count++;
+          // обновить данные с сервера
+          onclick_btn_request(null);
+        }
+    );
+    timeline.getKeyFrames().add(keyFrame);
+    System.out.println("TimeLine thread id "+ Thread.currentThread().getId());
+    timeline.play();
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -102,133 +267,16 @@ public class Controller extends OutputStream implements Initializable {
       }
     };
     //
-    OutputStream err = new OutputStream() {
-      @Override
-      public void write(int b) throws IOException {
-        appendTextErr(String.valueOf((char) b));
-      }
-      @Override
-      public void write(byte[] b, int off, int len) throws IOException {
-        appendTextErr(new String(b, off, len));
-      }
-
-      @Override
-      public void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-      }
-    };
     System.setOut(new PrintStream(out, true));
-    System.setErr(new PrintStream(err, true));
+  }
+
+  private void appendText(String str) {
+    Platform.runLater(() -> txt_stdout.appendText(str));
   }
 
   @Override
   public void write(int b) throws IOException {
-    Platform.runLater(() -> txt_output.appendText(""+b));
-  }
-
-  public void appendText(String str) {
-    Platform.runLater(() -> txt_output.appendText(str));
-  }
-  public void appendTextErr(String str) {
-    Platform.runLater(() -> txt_errout.appendText(str));
-  }
-
-  /**
-   * Метод вызывается при инициализации контролера
-   */
-  private void initialRun()
-  {
-    // заполним список пользователей про которых у нас есть ключи
-    loadUsers();
-    cmb_users.getSelectionModel().select(0);
-    onaction_cmb_users(null);   // заполним поле адресата
-    //
-    txt_usr.setText(R.getUsr());
-  }
-
-  /**
-   * заполнить список пользователей в комбо-боксе
-   */
-  private void  loadUsers()
-  {
-    String  str = cmb_users.getValue();
-    Collection<String> users = model.getUserNames();      // заполним список пользователей из локальной БД
-    cmb_users.getItems().removeAll(cmb_users.getItems()); // очистить список комбо-бокса
-    cmb_users.getItems().addAll(users);
-    if(str != null && str.length() > 1)
-      cmb_users.getSelectionModel().select(str);  // выбрать ранее выбранный
-  }
-
-  public void onclick_btn_send(ActionEvent ae)
-  {
-    String  un = R.trimWS(txt_to.getText());  // получить имя получателя
-    txt_to.setText(un); // запишем на всякий случай, без пробелов
-    //
-    if(!model.checkUserLocal(un)) {
-      if(!model.checkUserServer(un)) {
-        System.err.println("?-error-нет пользователя: " + un);
-        return;
-      } else {
-        loadUsers();  // перезагрузить пользователей
-      }
-    }
-    SendMessage sm = new SendMessage();
-    boolean b;
-    String msg = txt_message.getText();
-    b = sm.post(un, msg);
-    if(b) {
-      System.out.println(R.Now() + " сообщение отправлено");
-    }
-  }
-
-  public void onclick_btn_receive(ActionEvent ae)
-  {
-    ListMessages lm = new ListMessages();
-    String ufrom = txt_to.getText();
-    String uto = txt_usr.getText();
-    int[] ims;
-    ims = lm.getInt(ufrom, uto);
-    if(ims != null) {
-      System.out.println(R.Now() + " ");
-      for (int i1 : ims) {
-        System.out.println(i1);
-      }
-    } else {
-      System.err.println("?-error-нет данных с номерами сообщений");
-    }
-    // получим сообщение от отправителя
-    String usrFrom = txt_from.getText();
-    String str = model.getMessage(usrFrom);
-    if(str == null) {
-      str = "<сообщений нет>";
-    }
-    txt_receive.setText(str);
-
-  }
-
-  /**
-   * При изменении списка получателей заполнить поле "получатель"
-   * @param ae  событие
-   */
-  public void onaction_cmb_users(ActionEvent ae)
-  {
-    String str;
-    str = cmb_users.getValue(); // значение выбранноего элемента
-    // System.out.println("Акция " + str);
-    txt_to.setText(str);
-    txt_from.setText(str);
-  }
-
-  /**
-   * регистрация нового пользователя
-   * @param ae событие
-   */
-  public void onclick_btn_register(ActionEvent ae)
-  {
-    keygenmy.Dialog dialog = new keygenmy.Dialog();
-    dialog.open(ae);
-    //
-    txt_usr.setText(R.getUsr());
+    Platform.runLater(() -> txt_stdout.appendText(""+b));
   }
 
 } // end of class

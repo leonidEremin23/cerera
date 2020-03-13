@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2020. Eremin
- * 01.03.20 15:18
+ * 09.03.20 15:43
  *
  */
 
 /*
-   Месеенджер для обмена зашифрованными сообщениями
+   Обмен зашифрованными сообщениями
+   обработка списка отправителей сообщений через web-сервер
  */
 package messages;
 
@@ -21,9 +22,9 @@ public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception{
-    Parent root = FXMLLoader.load(getClass().getResource("messages.fxml"));
+    Parent root = FXMLLoader.load(getClass().getResource("senders.fxml"));
     primaryStage.getIcons().add(new Image("res/app.png"));
-    primaryStage.setTitle("Обмен зашифрованными сообщениями");
+    primaryStage.setTitle("Обмен зашифрованными сообщениями. Отправители сообщений");
     primaryStage.setScene(new Scene(root, 780, 500));
     primaryStage.getScene().getStylesheets().add("css/JMetroLightTheme.css"); //подключим стили
     primaryStage.show();
