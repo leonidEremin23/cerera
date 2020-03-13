@@ -6,7 +6,6 @@
 
 /*
    Обмен зашифрованными сообщениями
-   обработка списка отправителей сообщений через web-сервер
  */
 package messages;
 
@@ -21,10 +20,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
   @Override
-  public void start(Stage primaryStage) throws Exception{
-    Parent root = FXMLLoader.load(getClass().getResource("senders.fxml"));
+  public void start(Stage primaryStage) throws Exception {
+    Parent root = FXMLLoader.load(getClass().getResource("messages.fxml"));
     primaryStage.getIcons().add(new Image("res/app.png"));
-    primaryStage.setTitle("Обмен зашифрованными сообщениями. Отправители сообщений");
+    primaryStage.setTitle("Обмен зашифрованными сообщениями");
     primaryStage.setScene(new Scene(root, 780, 500));
     primaryStage.getScene().getStylesheets().add("css/JMetroLightTheme.css"); //подключим стили
     primaryStage.show();
