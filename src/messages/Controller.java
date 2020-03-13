@@ -104,6 +104,16 @@ public class Controller extends OutputStream implements Initializable {
   }
 
   /**
+   * установить имя адресата
+   * https://askdev.ru/q/peredacha-parametrov-javafx-fxml-12180/
+   * @param usr имя адресата
+   */
+  public void setAdresat(String usr)
+  {
+    txt_adresat.setText(usr);
+  }
+
+  /**
    * отправить сообщение адресату
    * @param ae событие
    */

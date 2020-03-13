@@ -20,10 +20,10 @@ import srv.SendMessage;
 import java.util.ArrayList;
 import java.util.List;
 
-class Model {
+public class Model {
   private Database mDb;
 
-  Model()
+  public Model()
   {
     this.mDb = R.getDb();
   }
@@ -47,7 +47,7 @@ class Model {
    * загрузить новые сообщения для текущего пользователя и их текст в локальную таблицу
    * @return кол-во загруженных сообщений
    */
-  int loadNewMessages()
+  public int loadNewMessages()
   {
     String  uTo = R.getUsr();
     String  pwd = R.getUsrPwd(uTo);
