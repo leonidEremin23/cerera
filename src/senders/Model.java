@@ -26,12 +26,15 @@ public class Model {
 
   /**
    * выдать данные по отправителям
-   * @return
+   * @return список данных
    */
   List<String[]>  getSenders()
   {
     String  sql;
-    sql = "SELECT usr,wdat,1 FROM keys WHERE mykey=0 ORDER BY usr";
+    sql = "SELECT DISTINCT ufrom,MAX(wdat) as dd,COUNT(*) FROM mess WHERE im > 0 GROUP BY ufrom " +
+        "UNION " +
+        "SELECT DISTINCT usr,wdat as dd,1 FROM keys WHERE mykey=0 AND usr NOT IN (SELECT ufrom FROM mess) " +
+        "ORDER BY dd desc;";
     ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
     return ar1;
   }
