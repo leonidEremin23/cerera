@@ -17,7 +17,7 @@
   ~
   -->
 
-<GridPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="messages.Controller">
+<GridPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="messages1.Controller">
 
     <Label prefHeight="22.0" text="пользователь" GridPane.columnIndex="1" GridPane.rowIndex="1">
       <GridPane.margin>

@@ -21,7 +21,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -126,7 +125,7 @@ public class Controller implements Initializable {
 //    ObservableList<Stroka> odat = list_senders.getItems();
 //    int n = odat.size();
 //    for(int i = 0; i < n; i++) {
-//      messages.Stroka stro = odat.get(i);
+//      messages1.Stroka stro = odat.get(i);
 //      int imi = stro.getIm();
 //      if(imi == im || im == 0) {
 //        newselectionModel.select(stro);
@@ -141,7 +140,7 @@ public class Controller implements Initializable {
    */
   public void onclick_btn_request(ActionEvent ae)
   {
-    messages.Model model2 = new messages.Model();
+    messages1.Model model2 = new messages1.Model();
     int n;
     n = model2.loadNewMessages();
     if(n > 0) {

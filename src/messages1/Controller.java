@@ -8,7 +8,7 @@
    Контролер сообщений через web-сервер
  */
 
-package messages;
+package messages1;
 
 import ae.R;
 import javafx.animation.Animation;

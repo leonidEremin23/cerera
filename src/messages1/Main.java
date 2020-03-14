@@ -7,7 +7,7 @@
 /*
    Обмен зашифрованными сообщениями
  */
-package messages;
+package messages1;
 
 import ae.R;
 import javafx.application.Application;
