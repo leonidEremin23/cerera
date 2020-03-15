@@ -70,8 +70,8 @@ public class Stroka {
   public String toString() {
     return
         "" + from.getValue() +
-        " (" + dat.getValue() + ")" +
-        " / " + nm.getValue()
-        ;
+//        " (" + dat.getValue() + ")" +
+//        " / " + nm.getValue() +
+        "" ;
   }
 } // end of class

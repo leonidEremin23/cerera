@@ -21,15 +21,22 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.swing.text.TableView;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class Controller extends OutputStream implements Initializable {
 
   private Model model = new Model();
 
@@ -48,12 +55,29 @@ public class Controller implements Initializable {
   @FXML
   ListView<Stroka>  list_senders;
 
+  @FXML
+  TextField txt_adresat;
+
+  @FXML
+  WebView wv_messages;
+
+  @FXML
+  TextField txt_send;
+
+  @FXML
+  Button btn_send;
+
+  @FXML
+  TextArea  txt_stdout;
+
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     // запуск при старте
     initRun();
+    attachStdout();
+    beginTimer();
   }
 
   /**
@@ -62,8 +86,15 @@ public class Controller implements Initializable {
   private void  initRun()
   {
     txt_usr.setText(R.getUsr());
+    // создать слушателя события в таблице
+    list_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+      if (newSelection != null) {
+        filledAdresat();
+      }
+    });
     loadData();
-
+    // выбрать нулевой элемент
+    Platform.runLater(() -> selectRow(0));
   }
 
   /**
@@ -84,6 +115,17 @@ public class Controller implements Initializable {
 //    col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
     // заполняем таблицу данными
     list_senders.setItems(usersData);
+  }
+
+  /**
+   * зарузить сообщения
+   */
+  private void  loadMessages()
+  {
+    String  html = model.loadHtml();
+    WebEngine engine = wv_messages.getEngine();
+    // engine.load(this.getClass().getResource("../html/test.html").toExternalForm());
+    engine.loadContent(html);
   }
 
   /**
@@ -121,8 +163,14 @@ public class Controller implements Initializable {
    */
   private void selectRow(int im)
   {
-//    MultiplySelectionModel<Stroka> newselectionModel = list_senders.getSelectionModel();
+    javafx.scene.control.MultipleSelectionModel<Stroka> newsel;
+    newsel = list_senders.getSelectionModel();
+    newsel.select(im);
 //    ObservableList<Stroka> odat = list_senders.getItems();
+//    Stroka stro = odat.get(0);
+//    if(stro != null) {
+//      newsel.select(0);
+//    }
 //    int n = odat.size();
 //    for(int i = 0; i < n; i++) {
 //      messages1.Stroka stro = odat.get(i);
@@ -132,6 +180,21 @@ public class Controller implements Initializable {
 //        break;
 //      }
 //    }
+  }
+
+  /**
+   * получить имя адресата из ListView
+   */
+  private void filledAdresat()
+  {
+    javafx.scene.control.MultipleSelectionModel<Stroka> selmodel = list_senders.getSelectionModel();
+    Stroka stro = selmodel.getSelectedItem();
+    if(stro != null) {
+      String fro = stro.getFrom();  // имя отправителя
+      prepareAdresat(fro);
+      // обновить список сообщений после отображения
+      Platform.runLater(() -> loadMessages());
+    }
   }
 
   /**
@@ -155,6 +218,45 @@ public class Controller implements Initializable {
     }
   }
 
+  /**
+   * отправить сообщение адресату
+   * @param ae событие
+   */
+  public void onclick_btn_send(ActionEvent ae)
+  {
+    String str = txt_adresat.getText();
+    String adr = prepareAdresat(str);
+
+    if (adr == null || adr.length() < 1) {
+      System.out.println(R.Now() + " адресат не указан");
+      return;
+    }
+    //
+    String msg = txt_send.getText();
+    if(msg != null && msg.length() > 0) {
+      boolean b;
+      b = model.sendMessage(msg);
+      if (b) {
+        System.out.println(R.Now() + " сообщение отправлено");
+        Platform.runLater(() -> afterSendMessage());
+      } else {
+        System.out.println(R.Now() + " ошибка отправки сообщения");
+      }
+    }
+  }
+
+  /**
+   * после отправки сообщения.
+   * очистить поле txt_send и загрузить данные
+   */
+  private void afterSendMessage()
+  {
+    txt_send.setText(null);
+    loadData();
+    // обновить список сообщений после отображения
+    Platform.runLater(() -> loadMessages());
+  }
+
   private int count = 0;
   // запуск таймера для обновления списка сообщений
   private void beginTimer()
@@ -176,5 +278,51 @@ public class Controller implements Initializable {
     timeline.play();
   }
 
+  /**
+   * приготовить имя адресата и записать его в поле txt_adresat
+   * @param userName новое имя пользователя
+   * @return имя адресата
+   */
+  private String  prepareAdresat(String userName)
+  {
+    String str;
+    model.setAdresat(userName);
+    str = model.getAdresat();
+    txt_adresat.setText(str);
+    return str;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Перенаправление стандартного вывода в TextArea
+  // class ... extends OutputStream implements Initializable {
+  // стандартный вывод System.output направил в поле txt_out
+  // https://code-examples.net/ru/q/19a134d
+  private void attachStdout()
+  {
+    OutputStream out = new OutputStream() {
+      @Override
+      public void write(int b) throws IOException {
+        appendText(String.valueOf((char) b));
+      }
+      @Override
+      public void write(byte[] b, int off, int len) throws IOException {
+        appendText(new String(b, off, len));
+      }
+      @Override
+      public void write(byte[] b) throws IOException {
+        write(b, 0, b.length);
+      }
+    };
+    System.setOut(new PrintStream(out, true));
+  }
+
+  private void appendText(String str) {
+    Platform.runLater(() -> txt_stdout.appendText(str));
+  }
+
+  @Override
+  public void write(int b) {
+    Platform.runLater(() -> txt_stdout.appendText(""+b));
+  }
 
 } // end of class

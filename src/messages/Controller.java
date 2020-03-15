@@ -72,7 +72,6 @@ public class Controller extends OutputStream implements Initializable {
   {
     //
     txt_usr.setText(R.getUsr());
-
     //
 //    // создать слушателя события в таблице
 //    list_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

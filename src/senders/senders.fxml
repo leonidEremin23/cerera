@@ -2,23 +2,40 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.web.WebView?>
 
-<GridPane alignment="center" hgap="10" vgap="10"
-          xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="senders.Controller">
+<GridPane alignment="center" hgap="10" vgap="5" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="senders.Controller">
 
-      <TextField fx:id="txt_usr" editable="false" maxWidth="-Infinity" text="пользователь" />
+    <TextField fx:id="txt_usr" editable="false" maxWidth="-Infinity" promptText="пользователь" />
+    <Button fx:id="btn_request" mnemonicParsing="false" onAction="#onclick_btn_request" text="опрос" GridPane.columnIndex="1" GridPane.halignment="LEFT" />
 
-       <Button fx:id="btn_close" mnemonicParsing="false" onAction="#onclick_btn_close" text="закрыть" GridPane.halignment="RIGHT" />
+    <ListView fx:id="list_senders" prefHeight="300.0" prefWidth="150.0" GridPane.rowIndex="1" />
+    <TextField fx:id="txt_adresat" maxWidth="-Infinity" promptText="адресат" GridPane.rowIndex="2" />
+    
+    <Button fx:id="btn_close" mnemonicParsing="false" onAction="#onclick_btn_close" text="закрыть" GridPane.columnIndex="1" GridPane.halignment="RIGHT" />
+    <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.rowIndex="3" />
 
-      <ListView fx:id="list_senders" prefHeight="300.0" prefWidth="400.0" GridPane.rowIndex="1" />
+    <WebView fx:id="wv_messages" prefHeight="200.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+    <TextField fx:id="txt_send" promptText="текст сообщения" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-      <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.rowIndex="2" />
-      <Button fx:id="btn_request" mnemonicParsing="false" onAction="#onclick_btn_request" text="опрос" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+    <Button fx:id="btn_send" mnemonicParsing="false" onAction="#onclick_btn_send" text="Отправить" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
 
+    <TextArea fx:id="txt_stdout" prefHeight="80.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
 
 </GridPane>

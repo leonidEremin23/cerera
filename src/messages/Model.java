@@ -41,6 +41,10 @@ public class Model {
     mAdresat = R.trimWS(userName);
   }
 
+  /**
+   * выдать имя адресата
+   * @return
+   */
   String  getAdresat()
   {
     return this.mAdresat;
