@@ -76,8 +76,8 @@ public class Controller extends OutputStream implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     // запуск при старте
     initRun();
-    attachStdout();
     beginTimer();
+    attachStdout();
   }
 
   /**
@@ -285,11 +285,14 @@ public class Controller extends OutputStream implements Initializable {
    */
   private String  prepareAdresat(String userName)
   {
-    String str;
+    String sadr;
     model.setAdresat(userName);
-    str = model.getAdresat();
-    txt_adresat.setText(str);
-    return str;
+    sadr = model.getAdresat();
+    txt_adresat.setText(sadr);
+    //
+    // проверим адресата на публичный ключ
+    model.isPublickey(sadr);
+    return sadr;
   }
 
   ///////////////////////////////////////////////////////////////////

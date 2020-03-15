@@ -12,6 +12,7 @@ package senders;
 
 import ae.Database;
 import ae.R;
+import srv.PubKey;
 import srv.SendMessage;
 
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class Model {
 
   /**
    * послать сообщение адресату
-   * @param textMsg
+   * @param textMsg текст сообщения
    * @return
    */
   boolean sendMessage(String textMsg)
@@ -105,6 +106,45 @@ public class Model {
       mDb.ExecSql(sql);
     }
     return b;
+  }
+
+  /**
+   * проверить публичный ключ пользователя в локальной БД,
+   * а если его нет, то попытаться загрузить его из сервера
+   * @param usr пользователь
+   * @return true есть публичный ключ, fasle нет ключа
+   */
+  boolean isPublickey(String usr)
+  {
+    String pubkey = getFldKeys(usr, "publickey");
+    if(pubkey == null || pubkey.length() < 16) {
+      PubKey pk = new PubKey();
+      String publickey = pk.get(usr);
+      if(publickey == null || publickey.length() < 16) {
+        System.out.println(R.Now() + " на сервере нет пользователя: " + usr);
+        return false;
+      }
+      mDb.ExecSql("DELETE FROM keys WHERE usr ='" + usr + "'");
+      String sql;
+      sql = "INSERT INTO keys (usr,publickey) VALUES ('" + usr + "','" + publickey + "')";
+      int a;
+      a = mDb.ExecSql(sql);
+      return (a==1);
+    }
+    return true;
+  }
+
+  /**
+   * вернуть значение поля заданного пользователя
+   * @param usr     пользователь
+   * @param fldName имя поля
+   * @return  содержимое поля или '?'
+   */
+  private String getFldKeys(String usr, String fldName)
+  {
+    String sql = "SELECT " + fldName + " FROM keys WHERE usr='" + usr + "'";
+    String msg = mDb.Dlookup(sql);
+    return msg;
   }
 
   /**

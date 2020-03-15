@@ -9,7 +9,6 @@
  */
 package srv;
 
-import ae.Database;
 import ae.MyCrypto;
 import ae.R;
 
@@ -31,6 +30,7 @@ public class SendMessage extends ServerData {
     String pubkey = R.getUsrPublickey(usrTo);
     String pwd = R.getUsrPwd(usrFrom);
     if(pubkey == null || pubkey.length() < 16 || pwd == null) {
+      System.err.println("?-error-SendMessage.post() нет публичного ключа получателя");
       return false;
     }
     MyCrypto mc = new MyCrypto(pubkey, null);
