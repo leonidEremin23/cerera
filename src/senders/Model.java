@@ -158,7 +158,6 @@ public class Model {
     html += "<head>" +
         "<style>" +
         ".mymess {" +
-        "  background-color: #56b3e2;" +
         "  color: #3a155d;" +
         "  text-align: right;" +
         "  border: 1px solid #e3d627;" +
@@ -166,6 +165,7 @@ public class Model {
         "}" +
         ".itmess {" +
         "  color: #0000a5;" +
+        "  background-color: #56b3e2;" +
         "  border: 1px solid #3d5d49;" +
         "  padding-left: 5px;" +
         "}" +
