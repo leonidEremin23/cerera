@@ -7,8 +7,9 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="senders.Controller">
-   <children>
+<GridPane alignment="center" hgap="10" vgap="10"
+          xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="senders.Controller">
 
       <TextField fx:id="txt_usr" editable="false" maxWidth="-Infinity" text="пользователь" />
 
@@ -19,13 +20,5 @@
       <Button fx:id="btn_register" mnemonicParsing="false" onAction="#onclick_btn_register" text="регистрация" GridPane.rowIndex="2" />
       <Button fx:id="btn_request" mnemonicParsing="false" onAction="#onclick_btn_request" text="опрос" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
 
-   </children>
-   <columnConstraints>
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-   </rowConstraints>
+
 </GridPane>
