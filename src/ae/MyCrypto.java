@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -450,7 +451,7 @@ public class MyCrypto {
    */
   public String encryptText(String text)
   {
-    byte[] bt = text.getBytes();
+    byte[] bt = text.getBytes(StandardCharsets.UTF_8);
     String otvet = encryptText(bt);
     return otvet;
   }
@@ -515,8 +516,10 @@ public class MyCrypto {
       String mess     = onlyHex(message);       // hex символы
       byte[] crypto   = hex2Byte(mess);         // зашифрованные байты
       byte[] decrypt  = decryptBigData(crypto); // расшифрованные байты
-      if(decrypt != null)
-        otvet = new String(decrypt);            // расшифрованный текст
+      if(decrypt != null) {
+        // https://stackoverflow.com/questions/8512121/utf-8-byte-to-string
+        otvet = new String(decrypt, StandardCharsets.UTF_8);            // расшифрованный текст
+      }
     } catch (Exception ex) {
       System.out.println("?-Error-decryptText(): " + ex.getMessage());
     }
