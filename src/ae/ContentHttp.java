@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -24,7 +23,6 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -36,9 +34,6 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.*;
 
 public class ContentHttp {
-  private String  baseUrl;    // "https://www.rfc-revizor.ru"; // базовый URL
-  private String  userName;   // учетное имя на сайте
-  private String  userPass;   // пароль на сайте
   // private int     maxBodysize = 10*1024*1024;
   private int     timeOut;      // 30000 таймаут соединений (мс)
   private String  proxyServ;    // *** "10.52.2.155"
@@ -73,7 +68,6 @@ public class ContentHttp {
 
   /**
    * Прочитать web-страницу по протоколу HTTP с аргументами POST
-   * с сервера АС Ревизор, с авторизацией на сервере.
    * @param urlQuest  URL страницы
    * @param postArgs  карта аргументов (название, значение)
    * @return  содержимое страницы
@@ -165,7 +159,7 @@ public class ContentHttp {
 //        // for (int i = 0; i < cookies.size(); i++) System.out.println("- " + cookies.get(i).toString());
 //        //
         Thread.sleep(200);  // задержимся на 200 мс, перед следующим запросом данных
-        // формируем запрос к АС Ревизор
+        // формируем запрос
         CloseableHttpResponse response2;
         if (postArgs == null) {
           // нет POST параметров - GET
