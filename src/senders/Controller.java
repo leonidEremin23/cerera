@@ -4,7 +4,8 @@
  *
  */
 /*
-   Контролер списка отправителей сообщений через web-сервер
+   Контролер списка отправителей сообщений и их сообщений
+   через web-сервер
  */
 
 package senders;
@@ -28,7 +29,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.swing.text.TableView;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -89,18 +89,18 @@ public class Controller extends OutputStream implements Initializable {
     // создать слушателя события в таблице
     list_senders.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
       if (newSelection != null) {
-        filledAdresat();
+        filledAdresat(); //
       }
     });
-    loadData();
+    loadSenders();
     // выбрать нулевой элемент
     Platform.runLater(() -> selectRow(0));
   }
 
   /**
-   * загрузить таблицу данными
+   * загрузить таблицу отправителей данными
    */
-  private void  loadData()
+  private void loadSenders()
   {
     usersData.clear();  // очистить таблицу от данных
     List<String[]> lst = model.getSenders();
@@ -166,24 +166,10 @@ public class Controller extends OutputStream implements Initializable {
     javafx.scene.control.MultipleSelectionModel<Stroka> newsel;
     newsel = list_senders.getSelectionModel();
     newsel.select(im);
-//    ObservableList<Stroka> odat = list_senders.getItems();
-//    Stroka stro = odat.get(0);
-//    if(stro != null) {
-//      newsel.select(0);
-//    }
-//    int n = odat.size();
-//    for(int i = 0; i < n; i++) {
-//      messages1.Stroka stro = odat.get(i);
-//      int imi = stro.getIm();
-//      if(imi == im || im == 0) {
-//        newselectionModel.select(stro);
-//        break;
-//      }
-//    }
   }
 
   /**
-   * получить имя адресата из ListView
+   * заполнить имя адресата из ListView
    */
   private void filledAdresat()
   {
@@ -203,17 +189,12 @@ public class Controller extends OutputStream implements Initializable {
    */
   public void onclick_btn_request(ActionEvent ae)
   {
-    messages1.Model model2 = new messages1.Model();
+    Model model = new Model();
     int n;
-    n = model2.loadNewMessages();
+    n = model.loadNewMessages();
     if(n > 0) {
-//      TableView.TableViewSelectionModel<Stroka> selectionModel = tbl_senders.getSelectionModel();
-//      Stroka stro = selectionModel.getSelectedItem();
-//      int im = 0;
-//      if (stro != null) im = stro.getIm();
-      //
-      loadData();
-      // выбрать после отображения
+      loadSenders(); //
+      // после отображения выбрать 0 строку списка отправителей
       Platform.runLater(() -> selectRow(0));
     }
   }
@@ -224,23 +205,26 @@ public class Controller extends OutputStream implements Initializable {
    */
   public void onclick_btn_send(ActionEvent ae)
   {
-    String str = txt_adresat.getText();
-    String adr = prepareAdresat(str);
-
+    String adr = prepareAdresat(txt_adresat.getText());
     if (adr == null || adr.length() < 1) {
       System.out.println(R.Now() + " адресат не указан");
       return;
     }
-    //
-    String msg = txt_send.getText();
-    if(msg != null && msg.length() > 0) {
-      boolean b;
-      b = model.sendMessage(msg);
-      if (b) {
-        System.out.println(R.Now() + " сообщение отправлено");
-        Platform.runLater(() -> afterSendMessage());
+    // проверим адресата на публичный ключ
+    if(model.isPublickey(adr)) {
+      // публичный ключ есть, отправляем сообщение
+      String msg = txt_send.getText();
+      if (msg != null && msg.length() > 0) {
+        boolean b;
+        b = model.sendMessage(msg);
+        if (b) {
+          System.out.println(R.Now() + " сообщение отправлено");
+          Platform.runLater(() -> afterSendMessage());
+        } else {
+          System.out.println(R.Now() + " ошибка отправки сообщения");
+        }
       } else {
-        System.out.println(R.Now() + " ошибка отправки сообщения");
+        System.err.println("?-warning-onclick_btn_send() пустая строка сообщения");
       }
     }
   }
@@ -252,7 +236,7 @@ public class Controller extends OutputStream implements Initializable {
   private void afterSendMessage()
   {
     txt_send.setText(null);
-    loadData();
+    loadSenders();
     // обновить список сообщений после отображения
     Platform.runLater(() -> loadMessages());
   }
@@ -289,9 +273,6 @@ public class Controller extends OutputStream implements Initializable {
     model.setAdresat(userName);
     sadr = model.getAdresat();
     txt_adresat.setText(sadr);
-    //
-    // проверим адресата на публичный ключ
-    model.isPublickey(sadr);
     return sadr;
   }
 

@@ -203,70 +203,70 @@ public class R {
       return null;
   }
 
-  /**
-   * Записать в файл текст из строки
-   * @param strTxt - строка текста
-   * @param fileName - имя файла
-   * @return      true - записано, false - ошибка
-   */
-  public static boolean  writeStr2File(String strTxt, String fileName)
-  {
-      File f = new File(fileName);
-      try {
-          PrintWriter out = new PrintWriter(f);
-          out.write(strTxt);
-          out.close();
-      } catch(IOException ex) {
-        System.err.println("?Error-writeStr2File() " + ex.getMessage());
-        return false;
-      }
-      return true;
-  }
+//  /**
+//   * Записать в файл текст из строки
+//   * @param strTxt - строка текста
+//   * @param fileName - имя файла
+//   * @return      true - записано, false - ошибка
+//   */
+//  public static boolean  writeStr2File(String strTxt, String fileName)
+//  {
+//      File f = new File(fileName);
+//      try {
+//          PrintWriter out = new PrintWriter(f);
+//          out.write(strTxt);
+//          out.close();
+//      } catch(IOException ex) {
+//        System.err.println("?Error-writeStr2File() " + ex.getMessage());
+//        return false;
+//      }
+//      return true;
+//  }
 
-  /**
-   *  Записать в файл ресурсный файл
-   * @param nameRes   имя ресурса (от корня src)
-   * @param fileName  имя файла, куда записывается ресурс
-   * @return  true - запись выполнена, false - ошибка
-   */
-  public boolean writeRes2File(String nameRes, String fileName)
-  {
-      boolean b = false;
-      ByteArrayOutputStream buf = readResB(nameRes);
-      if(buf != null) {
-          try {
-              FileOutputStream fout = new FileOutputStream(fileName);
-              buf.writeTo(fout);
-              fout.close();
-              b = true;
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-      }
-      return b;
-  }
+//  /**
+//   *  Записать в файл ресурсный файл
+//   * @param nameRes   имя ресурса (от корня src)
+//   * @param fileName  имя файла, куда записывается ресурс
+//   * @return  true - запись выполнена, false - ошибка
+//   */
+//  public boolean writeRes2File(String nameRes, String fileName)
+//  {
+//      boolean b = false;
+//      ByteArrayOutputStream buf = readResB(nameRes);
+//      if(buf != null) {
+//          try {
+//              FileOutputStream fout = new FileOutputStream(fileName);
+//              buf.writeTo(fout);
+//              fout.close();
+//              b = true;
+//          } catch (IOException e) {
+//              e.printStackTrace();
+//          }
+//      }
+//      return b;
+//  }
 
-  /**
-   * Загружает текстовый ресурс в заданной кодировке
-   * @param name      имя ресурса
-   * @param code_page кодировка, например "Cp1251"
-   * @return          строка ресурса
-   */
-  public String getText(String name, String code_page)
-  {
-      StringBuilder sb = new StringBuilder();
-      try {
-          InputStream is = this.getClass().getResourceAsStream(name);  // Имя ресурса
-          BufferedReader br = new BufferedReader(new InputStreamReader(is, code_page));
-          String line;
-          while ((line = br.readLine()) !=null) {
-              sb.append(line);  sb.append("\n");
-          }
-      } catch (IOException ex) {
-          ex.printStackTrace();
-      }
-      return sb.toString();
-  }
+//  /**
+//   * Загружает текстовый ресурс в заданной кодировке
+//   * @param name      имя ресурса
+//   * @param code_page кодировка, например "Cp1251"
+//   * @return          строка ресурса
+//   */
+//  public String getText(String name, String code_page)
+//  {
+//      StringBuilder sb = new StringBuilder();
+//      try {
+//          InputStream is = this.getClass().getResourceAsStream(name);  // Имя ресурса
+//          BufferedReader br = new BufferedReader(new InputStreamReader(is, code_page));
+//          String line;
+//          while ((line = br.readLine()) !=null) {
+//              sb.append(line);  sb.append("\n");
+//          }
+//      } catch (IOException ex) {
+//          ex.printStackTrace();
+//      }
+//      return sb.toString();
+//  }
 
   /**
    * Получить из таблицы _Info значение ключа, а если таблицы или ключа нет, то вернуть значение по-умолчанию
@@ -328,19 +328,19 @@ public class R {
     db.ExecSql("UPDATE _Info SET val=" + val + " WHERE key='" + keyName + "'");
   }
 
-  /**
-   * преобразовать секунды UNIX эпохи в строку даты
-   * @param unix  секунды эпохи UNIX
-   * @return дата и время в формате SQL (ГГГГ-ММ-ДД ЧЧ:ММ:СС)
-   */
-  public static String unix2datetimestr(int unix)
-  {
-    Date date = new Date(unix*1000L);
-    // format of the date
-    SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    //jdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
-    return jdf.format(date);
-  }
+//  /**
+//   * преобразовать секунды UNIX эпохи в строку даты
+//   * @param unix  секунды эпохи UNIX
+//   * @return дата и время в формате SQL (ГГГГ-ММ-ДД ЧЧ:ММ:СС)
+//   */
+//  public static String unix2datetimestr(int unix)
+//  {
+//    Date date = new Date(unix*1000L);
+//    // format of the date
+//    SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//    //jdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
+//    return jdf.format(date);
+//  }
 
   /*
    * Преобразование строки времени вида ЧЧ:ММ:СС в кол-во секунд
@@ -367,18 +367,18 @@ public class R {
 
   /////////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * Скопировать входной поток в строку
-   * @param inputStream входной поток
-   * @return выходная строка
-   */
-  public static String InputStream2String(InputStream inputStream)
-  {
-    // http://qaru.site/questions/226/readconvert-an-inputstream-to-a-string
-    Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-    String txt = s.hasNext() ? s.next() : "";
-    return txt;
-  }
+//  /**
+//   * Скопировать входной поток в строку
+//   * @param inputStream входной поток
+//   * @return выходная строка
+//   */
+//  public static String InputStream2String(InputStream inputStream)
+//  {
+//    // http://qaru.site/questions/226/readconvert-an-inputstream-to-a-string
+//    Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+//    String txt = s.hasNext() ? s.next() : "";
+//    return txt;
+//  }
 
 //  /**
 //   * Выделить e-mail из входной строки
@@ -397,29 +397,29 @@ public class R {
 //    return null;
 //  }
 
-  /**
-   * Выдать имя файла c расширением
-   * @param fullname полное имя файла
-   * @return имя файла
-   */
-  public static String getFileName(String fullname)
-  {
-    File f = new File(fullname);
-    return f.getName();
-  }
+//  /**
+//   * Выдать имя файла c расширением
+//   * @param fullname полное имя файла
+//   * @return имя файла
+//   */
+//  public static String getFileName(String fullname)
+//  {
+//    File f = new File(fullname);
+//    return f.getName();
+//  }
 
-  /**
-   * Выдать расширение файла
-   * @param fullname полное имя файла
-   * @return расширение
-   */
-  public static String getFileExtension(String fullname)
-  {
-    Pattern file_extension = Pattern.compile("\\.\\w{1,4}$", Pattern.CASE_INSENSITIVE);
-    Matcher mt = file_extension.matcher(fullname);
-    String fext = mt.find() ? mt.group() : ""; // расширение
-    return fext;
-  }
+//  /**
+//   * Выдать расширение файла
+//   * @param fullname полное имя файла
+//   * @return расширение
+//   */
+//  public static String getFileExtension(String fullname)
+//  {
+//    Pattern file_extension = Pattern.compile("\\.\\w{1,4}$", Pattern.CASE_INSENSITIVE);
+//    Matcher mt = file_extension.matcher(fullname);
+//    String fext = mt.find() ? mt.group() : ""; // расширение
+//    return fext;
+//  }
 
   /**
    * вернуть строку без пробелов и апострофов

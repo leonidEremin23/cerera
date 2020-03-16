@@ -631,72 +631,6 @@
  Индивидуальные настройки
  */
 
-#lbl_title {
-    -fx-font-size: large;
-    -fx-text-fill: #0000a5;
-}
-
-#btn_correct {
-    -fx-text-fill: brown;
-}
-
-#txt_idtask {
-    -fx-font-size: 1.2em;
-}
-
-#btn_account {
-    -fx-background-color: #bcbcbc;
-    -fx-font-size: 12px;
-}
-
-#btn_keys {
-    -fx-background-color: #bcbcbc;
-    -fx-font-size: 12px;
-}
-
-#btn_samples {
-    -fx-background-color: #bcbcbc;
-    -fx-font-size: 12px;
-}
-
-#btn_exit {
-    -fx-background-color: #65282c;
-    -fx-font-size: 14px;
-    -fx-text-fill: #c8bf4a;
-    -fx-background-radius: 8;
-}
-#btn_exit:hover {
-    -fx-background-color: #c02b0d;
-    -fx-text-fill: #91ff31;
-}
-
-#btn_app {
-    -fx-background-color: #c3c9f6;
-    -fx-text-fill: #101159;
-    -fx-font-size: 11px;
-    -fx-background-radius: 12px;
-     -fx-background-insets: 0, 0 0 0 0;
-}
-
-/* зададим фон для конкретного поля */
-#txt_result .content {
-    -fx-background-color: transparent;
-}
-
-#txt_output {
-    -fx-font-family: Consolas;
-    -fx-text-fill: green;
-}
-/* зададим фон для конкретного поля */
-#txt_output .content {
-    -fx-background-color: #d6ecb7;
-}
-
-#txt_errout {
-    -fx-font-family: Consolas;
-    -fx-text-fill: red;
-}
-
 /* зададим фон для конкретного поля TextArea */
 #txt_errout .content {
     -fx-background-color: #e2ecb5;
@@ -706,7 +640,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 11pt;
     -fx-text-fill: #158b16;
-    -fx-background-color: #d4e9f3;
+    -fx-background-color: #fbf8e9;
 }
 
 #txt_adresat {
@@ -725,3 +659,38 @@
     -fx-background-color: #d6ecb7;
 }
 
+/* кнопка "закрыть" */
+#btn_close {
+    -fx-background-color: #b1e4c5;
+    -fx-font-size: 12px;
+    -fx-text-fill: #978b1e;
+    -fx-background-radius: 8;
+}
+#btn_close:hover {
+    -fx-text-fill: #c41328;
+    -fx-font-weight: bold;
+    -fx-border-color: blue;
+}
+
+/* кнопка "опрос" */
+#btn_request {
+    -fx-background-color: #c2d3e8;
+    -fx-font-size: 12px;
+    -fx-text-fill: #c53cc8;
+    -fx-background-radius: 8;
+}
+#btn_request:hover {
+    -fx-background-color: #6066c6;
+    -fx-text-fill: #f9f649;
+}
+
+/* кнопка "регистрация" */
+#btn_register {
+    -fx-background-color: #cee8d2;
+    -fx-font-size: 10px;
+    -fx-text-fill: #1817ba;
+    -fx-background-radius: 8;
+}
+#btn_register:hover {
+    -fx-background-color: #88e67f;
+}

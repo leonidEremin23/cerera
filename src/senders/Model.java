@@ -12,10 +12,19 @@ package senders;
 
 import ae.Database;
 import ae.R;
+import srv.ListMessages;
+import srv.Message;
 import srv.PubKey;
 import srv.SendMessage;
 
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Model {
@@ -71,7 +80,7 @@ public class Model {
    * @return список данных
    * 0 - индекс сообщения, 1 - сообщение, 2 - дата
    */
-  List<String[]>  getMessagesList()
+  private List<String[]>  getMessagesList()
   {
     String  sql;
     sql = "SELECT im,msg,wdat FROM mess WHERE im > 0 AND ufrom='" + mAdresat + "' " +
@@ -81,6 +90,47 @@ public class Model {
     ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
     return ar1;
   }
+
+  /**
+   * загрузить новые сообщения для текущего пользователя и их текст
+   * в локальную таблицу из web-сервера
+   * @return кол-во загруженных сообщений
+   */
+  public int loadNewMessages()
+  {
+    String  uTo = R.getUsr();
+    String  pwd = R.getUsrPwd(uTo);
+    if(pwd == null) {
+      return 0;
+    }
+    // получим список новых сообщений и загрузим их в БД
+    ListMessages lm = new ListMessages();
+    List<String[]> lst = lm.get(null, uTo);
+    if(lst != null) {
+      for(String[] r: lst) {
+        String fmt = "INSERT INTO mess (im,ufrom,uto,wdat) VALUES('%s','%s','%s','%s')";
+        String sql = String.format(fmt, r[0],r[1],r[2],r[3]);
+        mDb.ExecSql(sql);
+      }
+    }
+    // загрузим текст новых сообщений в БД
+    String sql = "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uTo +"'";
+    ArrayList<String[]> ars = mDb.DlookupArray(sql);
+    int cnt = 0;
+    for(String[] r: ars) {
+      Integer im = Integer.parseInt(r[0]);
+      Message ms = new Message();
+      String msg = ms.get(uTo, im);
+      if(msg != null) {
+        String imsg = mDb.s2s(msg);
+        String isql = "UPDATE mess SET msg =" + imsg + " WHERE im=" + im;
+        mDb.ExecSql(isql);
+        cnt++;
+      }
+    }
+    return cnt;
+  }
+
 
   /**
    * послать сообщение адресату
@@ -153,46 +203,50 @@ public class Model {
    */
   String  loadHtml()
   {
-
-    String html = "";
-//    html += "<html>";
-//    html += "<head>" +
-//        "<style>" +
-//        ".mymess {" +
-//        "  color: #3a155d;" +
-//        "  text-align: right;" +
-//        "  border: 1px solid #e3d627;" +
-//        "  padding-right: 16px" +
-//        "}" +
-//        ".itmess {" +
-//        "  color: #0000a5;" +
-//        "  background-color: #56b3e2;" +
-//        "  border: 1px solid #3d5d49;" +
-//        "  padding-left: 5px;" +
-//        "}" +
-//        "</style>" +
-//        " </head>";
-//    html += "<body onLoad=\"javascript:top.scroll(-1,1000000);\">";
-    String body = "";
+    // https://metanit.com/java/tutorial/7.3.php
+    StringBuilder body = new StringBuilder();
     List<String[]> lst = getMessagesList(); // список сообщений
     for(String[] r: lst) {
       // 0 - индекс сообщения, 1 - сообщение, 2 - дата
       int im = Integer.parseInt(r[0]); // индекс
       String msg = r[1];  // сообщение
-      String dat = r[2];  // дата
-      String cls = (im> 0)?"itmess": "mymess";  // их сообщение : моё сообщение
-      String sdiv = "<div class=\""+ cls + "\">";
-      sdiv += msg;
-      sdiv += "<br><small>" + dat + "</small>";
-      sdiv += "</div>\n";
-      body += sdiv;
+      String dat = formatDate(r[2]);  // дата
+      String cls = (im > 0)? "itm": "mym";  // их сообщение : моё сообщение
+      final String fmt = "<div class='%s'>%s<br><span class='dt'>%s</span></div>";
+      String sdiv = String.format(fmt, cls,msg, dat);
+      body.append(sdiv);
     }
-    String txt = R.readRes("../html/mess.html");  // загрузить шаблон
+    String txt = R.readRes("/html/mess.html");  // загрузить шаблон
     String out = String.format(txt, body);
-
-//    html += "</body></html>";
     return out;
   }
 
+  private static final SimpleDateFormat sInpfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private static final SimpleDateFormat sOutfmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+  /**
+   * преобразовать формат даты
+   * @param strDat входной формат даты
+   * @return выходной формат даты
+   */
+  private String  formatDate(String strDat)
+  {
+    try {
+      Date dat = sInpfmt.parse(strDat);
+      //Date now = new Date();
+      //long t2 = now.getTime();
+      //long t1 = dat.getTime();
+      //String str;
+      //if((t2-t1) > 24*60*60*1000) {
+      //  str = fmtd.format(dat);
+      //} else {
+      //  str = fmth.format(dat);
+      //}
+      return sOutfmt.format(dat);
+    } catch (Exception e) {
+      System.err.println("?-error-formatDate() " + e.getMessage());
+      return strDat;
+    }
+  }
 
 } // end of class
