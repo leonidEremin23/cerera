@@ -6,6 +6,7 @@
 
 package ae;
 
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.stage.Stage;
@@ -161,7 +162,7 @@ public class R {
    * @param nameRes - имя ресурсного файла
    * @return -содержимое ресурсного файла
    */
-  public String readRes(String nameRes)
+  public static String readRes(String nameRes)
   {
       String str = null;
       ByteArrayOutputStream buf = readResB(nameRes);
@@ -176,11 +177,13 @@ public class R {
    * @param nameRes - название ресурса (относительно каталога пакета)
    * @return - байтовый массив
    */
-  private ByteArrayOutputStream readResB(String nameRes)
+  private static ByteArrayOutputStream readResB(String nameRes)
   {
       try {
           // Get current classloader
-          InputStream is = getClass().getResourceAsStream(nameRes);
+          //InputStream is = getClass().getResourceAsStream(nameRes);
+          // https://stackoverflow.com/a/8275508
+          InputStream is = R.class.getResourceAsStream(nameRes);
           if(is == null) {
               System.out.println("Not found resource: " + nameRes);
               return null;

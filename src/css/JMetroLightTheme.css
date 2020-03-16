@@ -712,8 +712,8 @@
 #txt_adresat {
     -fx-font-size: 10pt;
     -fx-font-weight: bold;
-    -fx-text-fill: #39596c;
-    -fx-background-color: #f3eebe;
+    -fx-text-fill: #1f1b43;
+    -fx-background-color: #a9c4f3;
 }
 
 #txt_stdout {

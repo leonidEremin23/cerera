@@ -153,25 +153,27 @@ public class Model {
    */
   String  loadHtml()
   {
+
     String html = "";
-    html += "<html>";
-    html += "<head>" +
-        "<style>" +
-        ".mymess {" +
-        "  color: #3a155d;" +
-        "  text-align: right;" +
-        "  border: 1px solid #e3d627;" +
-        "  padding-right: 16px" +
-        "}" +
-        ".itmess {" +
-        "  color: #0000a5;" +
-        "  background-color: #56b3e2;" +
-        "  border: 1px solid #3d5d49;" +
-        "  padding-left: 5px;" +
-        "}" +
-        "</style>" +
-        " </head>";
-    html += "<body onLoad=\"javascript:top.scroll(-1,1000000);\">";
+//    html += "<html>";
+//    html += "<head>" +
+//        "<style>" +
+//        ".mymess {" +
+//        "  color: #3a155d;" +
+//        "  text-align: right;" +
+//        "  border: 1px solid #e3d627;" +
+//        "  padding-right: 16px" +
+//        "}" +
+//        ".itmess {" +
+//        "  color: #0000a5;" +
+//        "  background-color: #56b3e2;" +
+//        "  border: 1px solid #3d5d49;" +
+//        "  padding-left: 5px;" +
+//        "}" +
+//        "</style>" +
+//        " </head>";
+//    html += "<body onLoad=\"javascript:top.scroll(-1,1000000);\">";
+    String body = "";
     List<String[]> lst = getMessagesList(); // список сообщений
     for(String[] r: lst) {
       // 0 - индекс сообщения, 1 - сообщение, 2 - дата
@@ -183,10 +185,13 @@ public class Model {
       sdiv += msg;
       sdiv += "<br><small>" + dat + "</small>";
       sdiv += "</div>\n";
-      html += sdiv;
+      body += sdiv;
     }
-    html += "</body></html>";
-    return html;
+    String txt = R.readRes("../html/mess.html");  // загрузить шаблон
+    String out = String.format(txt, body);
+
+//    html += "</body></html>";
+    return out;
   }
 
 
