@@ -36,7 +36,7 @@ import javax.net.ssl.*;
 public class ContentHttp {
   // private int     maxBodysize = 10*1024*1024;
   private int     timeOut;      // 30000 таймаут соединений (мс)
-  private String  proxyServ;    // *** "10.52.2.155"
+  private String  proxyServ;    // *** "10..."
   private int     proxyPort;    // *** 3128;
   private String  proxyUser;
   private String  proxyPass;
@@ -48,8 +48,6 @@ public class ContentHttp {
     proxyPort = R.ProxyPort;
     proxyUser = R.ProxyUser;
     proxyPass = R.ProxyPass;
-    //userName  = R.SiteUsr;
-    //userPass  = R.SitePwd;
     timeOut   = R.TimeOut;
     if (proxyServ != null && proxyServ.length() < 8) {
       proxyServ = null;
@@ -113,52 +111,6 @@ public class ContentHttp {
           .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)  // http://qaru.site/questions/44866/how-to-ignore-ssl-certificate-errors-in-apache-httpclient-40
           .build();
       try {
-        // убираем регистрацию на сервере
-//        CloseableHttpResponse response0;
-//        HttpGet httpget = new HttpGet(baseUrl);
-//        response0 = httpclient.execute(httpget);
-//        try {
-//          HttpEntity entity = response0.getEntity();
-//          EntityUtils.consume(entity);
-//          //System.out.println("Login to: " + response0.getStatusLine());
-//          // System.out.println("Initial set of cookies:");
-//          // List<Cookie> cookies = cookieStore.getCookies();
-//          // if (cookies.isEmpty()) { System.out.println("None"); }
-//          // else { for (int i = 0; i < cookies.size(); i++) { System.out.println("- " + cookies.get(i).toString()); } }
-//        } finally {
-//          response0.close();
-//        }
-//        CloseableHttpResponse response1;
-//        // передаем регистрационные данные в АС
-//        HttpUriRequest login = RequestBuilder.post()
-//            .setUri(new URI(baseUrl))
-//            .addParameter("OAMAuthorizationUserName", userName)
-//            .addParameter("OAMAuthorizationUserPassword", userPass)
-//            .build();
-//        response1 = httpclient.execute(login);
-//        try {
-//          HttpEntity entity = response1.getEntity();
-//          EntityUtils.consume(entity);
-//          String ss = String.valueOf(response1.getStatusLine());
-//          if (!ss.matches(OkMatches)) {
-//            System.out.println("?-Error-нет ответа от сервера");
-//            return null;
-//          }
-//        } finally {
-//          response1.close();
-//        }
-//        // String str1 = EntityUtils.toString(response1.getEntity());
-//        // System.out.println(str1);
-//
-//        List<Cookie> cookies = cookieStore.getCookies();
-//        if (cookies.isEmpty()) {
-//          System.out.println("?-Error-авторизация не прошла"); // авторизация не прошла!
-//          return null;
-//        }
-//        // System.out.println("Post logon cookies");
-//        // for (int i = 0; i < cookies.size(); i++) System.out.println("- " + cookies.get(i).toString());
-//        //
-        Thread.sleep(200);  // задержимся на 200 мс, перед следующим запросом данных
         // формируем запрос
         CloseableHttpResponse response2;
         if (postArgs == null) {
@@ -180,7 +132,7 @@ public class ContentHttp {
         try {
           String ss = String.valueOf(response2.getStatusLine());
           if (!ss.matches(OkMatches)) {
-            System.err.println("?-Error-нет данных от сервера. ContentHttp() 189");
+            System.err.println("?-error-нет правильного ответа сервера");
             return null;
           }
           // долгожданный ответ
@@ -189,16 +141,15 @@ public class ContentHttp {
           response2.close();
         }
       } catch (Exception e) {
-        System.err.println(e.getMessage() + ". ContentHttp() 198");
+        System.err.println(e.getMessage());
       } finally {
         httpclient.close();
       }
       //
     } catch (Exception e) {
-      System.err.println(e.getMessage() + ". ContentHttp() 204");
+      System.err.println(e.getMessage());
     }
     return output;
   }
 
 } // end of class
-

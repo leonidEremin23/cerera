@@ -19,9 +19,6 @@ public class UserList extends ServerData {
   {
     if(mUsers == null) {
       loadUsers();
-      if(mUsers == null) {
-        mUsers = new String[0];
-      }
     }
     return mUsers;
   }
@@ -42,8 +39,11 @@ public class UserList extends ServerData {
   public boolean  inList(String username)
   {
     read();
-    for (String u: mUsers) {
-      if(u.contains(username)) {
+    if(mUsers == null) {
+      return true;  // как-будто есть, чтобы не регистрировался
+    }
+    for (String u : mUsers) {
+      if (u.contentEquals(username)) {
         return true;
       }
     }

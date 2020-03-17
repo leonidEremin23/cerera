@@ -47,9 +47,14 @@ public class Controller implements Initializable {
   public void initialize(URL location, ResourceBundle resources)
   {
     // показать имя
-    txt_user.setText(R.getUsr());
+    String usr = R.getUsr();
+    txt_user.setText(usr);
     // показать сервер
     lbl_server.setText(R.getServer());
+    if(usr != null) {
+      btn_check.setDisable(true);
+      btn_keygen.setDisable(true);
+    }
   }
 
   /**
