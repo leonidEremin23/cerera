@@ -5,7 +5,7 @@
  */
 
 /*
-   Модель списка отправителей сообщений через web-сервер
+   Модель списка отправителей и их сообщений
  */
 
 package senders;
@@ -18,27 +18,19 @@ import srv.PubKey;
 import srv.SendMessage;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Model {
+class Model {
 
   private Database mDb;
 
-  private String    mUsr;       // имя текущего пользователя
-
-  private String    mAdresat;   // имя другого пользователя
+  private String    mAdresat;   // имя адресата (другого пользователя)
 
   Model()
   {
     mDb = R.getDb();
-    mUsr  = R.getUsr();
   }
 
   /**
@@ -96,7 +88,7 @@ public class Model {
    * в локальную таблицу из web-сервера
    * @return кол-во загруженных сообщений
    */
-  public int loadNewMessages()
+  int loadNewMessages()
   {
     String  uTo = R.getUsr();
     String  pwd = R.getUsrPwd(uTo);
@@ -131,28 +123,30 @@ public class Model {
     return cnt;
   }
 
-
   /**
    * послать сообщение адресату
    * @param textMsg текст сообщения
-   * @return
+   * @return true - сообщение отправлено и записано, false - ошибка отправки
    */
   boolean sendMessage(String textMsg)
   {
     SendMessage sm = new SendMessage();
     boolean b = sm.post(mAdresat, textMsg);
     if(b) {
-      // запишем в локальную БД сообщение
+      // запишем в локальную БД своё сообщение
+      // индекс своего сообщения меньше 0.
       String si = mDb.Dlookup("SELECT MIN(im) FROM mess");
       if(null == si) si ="0";
       int im = Integer.parseInt(si);
       if(im > 0) im = 0;
       im--;
-      String sql = "INSERT INTO mess(im,ufrom,uto,msg,wdat) VALUES(" + im + ","
+      String sql = "INSERT INTO mess(im,ufrom,uto,msg,wdat) VALUES("
+                + im               + ","
           + "'" + R.getUsr()       + "',"
           + "'" + mAdresat         + "',"
           +       mDb.s2s(textMsg) + ","
-          + "'" + R.Now("yyyy-MM-dd HH:mm:ss") + "')";
+          + "'" + R.Now("yyyy-MM-dd HH:mm:ss")
+          + "')";
       mDb.ExecSql(sql);
     }
     return b;
@@ -216,7 +210,9 @@ public class Model {
       String sdiv = String.format(fmt, cls,msg, dat);
       body.append(sdiv);
     }
-    String txt = R.readRes("/html/mess.html");  // загрузить шаблон
+    // загрузить шаблон страницы из ресурса
+    String txt = R.readRes("/html/mess.html");
+    // вставить в шаблон (%s) тело страницы
     String out = String.format(txt, body);
     return out;
   }
@@ -233,20 +229,11 @@ public class Model {
   {
     try {
       Date dat = sInpfmt.parse(strDat);
-      //Date now = new Date();
-      //long t2 = now.getTime();
-      //long t1 = dat.getTime();
-      //String str;
-      //if((t2-t1) > 24*60*60*1000) {
-      //  str = fmtd.format(dat);
-      //} else {
-      //  str = fmth.format(dat);
-      //}
       return sOutfmt.format(dat);
     } catch (Exception e) {
       System.err.println("?-error-formatDate() " + e.getMessage());
-      return strDat;
     }
+    return strDat;
   }
 
 } // end of class
