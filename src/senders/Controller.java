@@ -74,7 +74,7 @@ public class Controller extends OutputStream implements Initializable {
   // признак запроса к серверу
   private AtomicInteger mAskRequest = new AtomicInteger(0);
 
-  private int mPauseRequest = 65; // время интервала опроса сервера
+  private int mPauseRequest = 20; // время интервала опроса сервера
 
   // данные по отправителям
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
@@ -224,6 +224,8 @@ public class Controller extends OutputStream implements Initializable {
       // если задано имя текущего пользователя,
       // то опросим сервер
       requestServer();
+    } else {
+      System.out.println("нет пользователя. зарегистрируйся на сервере");
     }
   }
 
@@ -283,8 +285,6 @@ public class Controller extends OutputStream implements Initializable {
   {
     txt_send.setText(null);
     loadSenders(model.getAdresat());
-    // обновить список сообщений после отображения
-    //Platform.runLater(() -> loadMessages());
   }
 
   private Timeline mTimeline;   // тайм-лайн опроса сервера
@@ -357,11 +357,13 @@ public class Controller extends OutputStream implements Initializable {
       // опросить сервер и загрузить в локальную БД новые сообщения
       int n = model.loadNewMessages();
       if(n > 0) {
-        // после отображения выбрать загрузить получателей из локальной БД
+        // после отображения (отоложенный запуск)
+        // загрузить получателей из локальной БД
         Platform.runLater(() -> loadSenders(null));
       }
+      // убавим признак - сообщения прочитаны с сервера
       mAskRequest.decrementAndGet();
-      System.err.println(R.Now() + " опрос сообщений: " + n);
+      // /// System.err.println(R.Now() + " опрос сообщений: " + n);
     }
   }
 

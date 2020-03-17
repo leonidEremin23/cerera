@@ -58,7 +58,7 @@ public class R {
         "CREATE TABLE _Info(key VARCHAR(32) PRIMARY KEY, val TEXT);" +
         "CREATE TABLE keys (usr VARCHAR(32) PRIMARY KEY, mykey INT DEFAULT 0, publickey TEXT, privatekey TEXT, pwd TEXT, wdat DATETIME DEFAULT (DATETIME('now', 'localtime')));" +
         "CREATE TABLE mess (im INT primary key, ufrom VARCHAR(32), uto VARCHAR(32), msg TEXT, datr DATETIME, wdat DATETIME);" +
-        "INSERT INTO _Info(key,val) VALUES('Server','http://localhost/webcerera/srv/');" +
+        // "INSERT INTO _Info(key,val) VALUES('Server','http://localhost/webcerera/srv/');" +
         "";
     if(db == null) {
       db = new DatabaseSqlite(WorkDB);
@@ -203,71 +203,6 @@ public class R {
       return null;
   }
 
-//  /**
-//   * Записать в файл текст из строки
-//   * @param strTxt - строка текста
-//   * @param fileName - имя файла
-//   * @return      true - записано, false - ошибка
-//   */
-//  public static boolean  writeStr2File(String strTxt, String fileName)
-//  {
-//      File f = new File(fileName);
-//      try {
-//          PrintWriter out = new PrintWriter(f);
-//          out.write(strTxt);
-//          out.close();
-//      } catch(IOException ex) {
-//        System.err.println("?Error-writeStr2File() " + ex.getMessage());
-//        return false;
-//      }
-//      return true;
-//  }
-
-//  /**
-//   *  Записать в файл ресурсный файл
-//   * @param nameRes   имя ресурса (от корня src)
-//   * @param fileName  имя файла, куда записывается ресурс
-//   * @return  true - запись выполнена, false - ошибка
-//   */
-//  public boolean writeRes2File(String nameRes, String fileName)
-//  {
-//      boolean b = false;
-//      ByteArrayOutputStream buf = readResB(nameRes);
-//      if(buf != null) {
-//          try {
-//              FileOutputStream fout = new FileOutputStream(fileName);
-//              buf.writeTo(fout);
-//              fout.close();
-//              b = true;
-//          } catch (IOException e) {
-//              e.printStackTrace();
-//          }
-//      }
-//      return b;
-//  }
-
-//  /**
-//   * Загружает текстовый ресурс в заданной кодировке
-//   * @param name      имя ресурса
-//   * @param code_page кодировка, например "Cp1251"
-//   * @return          строка ресурса
-//   */
-//  public String getText(String name, String code_page)
-//  {
-//      StringBuilder sb = new StringBuilder();
-//      try {
-//          InputStream is = this.getClass().getResourceAsStream(name);  // Имя ресурса
-//          BufferedReader br = new BufferedReader(new InputStreamReader(is, code_page));
-//          String line;
-//          while ((line = br.readLine()) !=null) {
-//              sb.append(line);  sb.append("\n");
-//          }
-//      } catch (IOException ex) {
-//          ex.printStackTrace();
-//      }
-//      return sb.toString();
-//  }
-
   /**
    * Получить из таблицы _Info значение ключа, а если таблицы или ключа нет, то вернуть значение по-умолчанию
    * CREATE TABLE _Info(key text PRIMARY KEY, val text)
@@ -366,60 +301,6 @@ public class R {
 */
 
   /////////////////////////////////////////////////////////////////////////////////
-
-//  /**
-//   * Скопировать входной поток в строку
-//   * @param inputStream входной поток
-//   * @return выходная строка
-//   */
-//  public static String InputStream2String(InputStream inputStream)
-//  {
-//    // http://qaru.site/questions/226/readconvert-an-inputstream-to-a-string
-//    Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-//    String txt = s.hasNext() ? s.next() : "";
-//    return txt;
-//  }
-
-//  /**
-//   * Выделить e-mail из входной строки
-//   * @param inputStr входная строка
-//   * @return строка e-mail или null если ажреса нет
-//   */
-//  public static String  extractEmail(String inputStr)
-//  {
-//    // регулярное выражение для выделения эл. адреса
-//    Pattern email_pattern = Pattern.compile("[a-z0-9_.\\-]+@[a-z0-9.\\-]+\\.[a-z]{2,4}",Pattern.CASE_INSENSITIVE);
-//    Matcher mat = email_pattern.matcher(inputStr);
-//    if(mat.find()) {
-//      String m = mat.group();
-//      return m;
-//    }
-//    return null;
-//  }
-
-//  /**
-//   * Выдать имя файла c расширением
-//   * @param fullname полное имя файла
-//   * @return имя файла
-//   */
-//  public static String getFileName(String fullname)
-//  {
-//    File f = new File(fullname);
-//    return f.getName();
-//  }
-
-//  /**
-//   * Выдать расширение файла
-//   * @param fullname полное имя файла
-//   * @return расширение
-//   */
-//  public static String getFileExtension(String fullname)
-//  {
-//    Pattern file_extension = Pattern.compile("\\.\\w{1,4}$", Pattern.CASE_INSENSITIVE);
-//    Matcher mt = file_extension.matcher(fullname);
-//    String fext = mt.find() ? mt.group() : ""; // расширение
-//    return fext;
-//  }
 
   /**
    * вернуть строку без пробелов и апострофов

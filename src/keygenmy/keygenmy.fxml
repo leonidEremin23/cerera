@@ -25,8 +25,8 @@
       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="публичный ключ" textFill="#3a88b5" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="приватный ключ" textAlignment="RIGHT" textFill="#3a88b5" GridPane.columnIndex="2" GridPane.rowIndex="3" />
       <Button fx:id="btn_close" defaultButton="true" mnemonicParsing="false" onAction="#onclick_btn_close" text="Закрыть" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-      <TextArea fx:id="ta_publicKey" prefHeight="200.0" prefWidth="320.0" promptText="публичный ключ" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-      <TextArea fx:id="ta_privateKey" editable="false" prefHeight="200.0" prefWidth="320.0" promptText="приватный ключ" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+      <TextArea fx:id="ta_publicKey" prefHeight="150.0" prefWidth="300.0" promptText="публичный ключ" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <TextArea fx:id="ta_privateKey" editable="false" prefHeight="150.0" prefWidth="300.0" promptText="приватный ключ" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
       <Label fx:id="lbl_server" text="сервер" textFill="#340985" GridPane.columnIndex="1" GridPane.rowIndex="5" />
    <columnConstraints>
       <ColumnConstraints />

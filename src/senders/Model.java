@@ -203,7 +203,7 @@ class Model {
       int im = Integer.parseInt(r[0]); // индекс
       String msg = r[1];  // сообщение
       String dat = formatDate(r[2]);  // дата
-      String cls = (im > 0)? "itm": "mym";  // их сообщение : моё сообщение
+      String cls = (im > 0)? "itm": "mym";  // их сообщение >0; моё сообщение <0
       final String fmt = "<div class='%s'>%s<br><span class='dt'>%s</span></div>";
       String sdiv = String.format(fmt, cls,msg, dat);
       body.append(sdiv);

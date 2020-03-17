@@ -1,8 +1,17 @@
-package ae;
+
+/*
+ * Copyright (c) 2020. Eremin
+ * 09.05.2018
+ * 17.03.20 19:29
+ *
+ */
+
 /*
 Криптографические утилиты, по мотивам
 http://findevelop.blogspot.ru/2013/04/java.html
  */
+
+package ae;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,12 +27,12 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 public class MyCrypto {
-  private final String  ALGORITHM = "RSA";
-  private final int     ALGORITHM_LENGTH = 128; // длина RSA шифровки (байт)
-  private final String  ALGORITHM_SIMMETRIC = "AES";
-  private final int     ALGORITHM_SIMMETRIC_LENGTH = 16; // длина ключа AES (байт)
-  private final String  HASH_METHOD = "MD5";
-  private final int     HASH_LENGTH = 16;  // длина хэш суммы (байт)
+  private static final String  ALGORITHM = "RSA";
+  private static final int     ALGORITHM_LENGTH = 128; // длина RSA шифровки (байт)
+  private static final String  ALGORITHM_SIMMETRIC = "AES";
+  private static final int     ALGORITHM_SIMMETRIC_LENGTH = 16; // длина ключа AES (байт)
+  private static final String  HASH_METHOD = "MD5";
+  private static final int     HASH_LENGTH = 16;  // длина хэш суммы (байт)
 
   private String s_publicKey = null;
   private String s_privateKey = null;
@@ -110,7 +119,7 @@ public class MyCrypto {
    * @param key   ключ
    * @param mess  исходное сообщение
    * @return  зашифрованное сообщение
-   * @throws GeneralSecurityException
+   * @throws GeneralSecurityException исключение секретного алгоритма
    */
   private byte[] encryptAES(byte[] key, byte[] mess) throws GeneralSecurityException
   {
@@ -526,5 +535,4 @@ public class MyCrypto {
     return otvet;
   }
 
-} // end of class.
-
+} // end of class
