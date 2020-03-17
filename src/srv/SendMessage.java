@@ -21,9 +21,9 @@ public class SendMessage extends ServerData {
    * послать новое сообщение, зашифровав его
    * @param usrTo   имя получателя
    * @param msg     текст сообщения
-   * @return true - сообщение отправлено, false - ошибка
+   * @return номер посланного сообщения, 0 ошибка
    */
-  public boolean  post(String usrTo, String msg)
+  public int  post(String usrTo, String msg)
   {
     String usrFrom = R.getUsr(); // отправитель
     // зашифруем сообщение
@@ -31,7 +31,7 @@ public class SendMessage extends ServerData {
     String pwd = R.getUsrPwd(usrFrom);
     if(pubkey == null || pubkey.length() < 16 || pwd == null) {
       System.err.println("?-error-SendMessage.post() нет публичного ключа получателя");
-      return false;
+      return 0;
     }
     MyCrypto mc = new MyCrypto(pubkey, null);
     String cry = mc.encryptText(msg);
@@ -43,7 +43,14 @@ public class SendMessage extends ServerData {
         "msg",  cry
     );
     //
-    return super.post(sKey, args);
+    String[] otv = super.postStr(sKey, args);
+    try {
+      Integer ii = Integer.parseInt(otv[0]);
+      return ii;
+    } catch (Exception e) {
+      System.err.println("?-error-SendMessage.post " + e.getMessage());
+    }
+    return 0;
   }
 
 }

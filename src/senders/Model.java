@@ -131,15 +131,11 @@ class Model {
   boolean sendMessage(String textMsg)
   {
     SendMessage sm = new SendMessage();
-    boolean b = sm.post(mAdresat, textMsg);
-    if(b) {
-      // запишем в локальную БД своё сообщение
+    int b = sm.post(mAdresat, textMsg);
+    if(b > 0) {
+      // запишем в локальную БД своё сообщение с отрицательным знаком
       // индекс своего сообщения меньше 0.
-      String si = mDb.Dlookup("SELECT MIN(im) FROM mess");
-      if(null == si) si ="0";
-      int im = Integer.parseInt(si);
-      if(im > 0) im = 0;
-      im--;
+      int im = 0 - b;
       String sql = "INSERT INTO mess(im,ufrom,uto,msg,wdat) VALUES("
                 + im               + ","
           + "'" + R.getUsr()       + "',"
@@ -148,8 +144,9 @@ class Model {
           + "'" + R.Now("yyyy-MM-dd HH:mm:ss")
           + "')";
       mDb.ExecSql(sql);
+      return true;
     }
-    return b;
+    return false;
   }
 
   /**

@@ -74,7 +74,7 @@ public class Controller extends OutputStream implements Initializable {
   // признак запроса к серверу
   private AtomicInteger mAskRequest = new AtomicInteger(0);
 
-  private int mPauseRequest = 5; // время интервала опроса сервера
+  private int mPauseRequest = 65; // время интервала опроса сервера
 
   // данные по отправителям
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();

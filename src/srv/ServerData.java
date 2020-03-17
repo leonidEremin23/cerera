@@ -86,7 +86,7 @@ public class ServerData {
    * Послать запрос к серверу и получить массив строк
    * @param key   ключ операции
    * @param args  аргументы посылки
-   * @return true задача выполнена, false задача не выполнена
+   * @return массив строк, null - ошибка
    */
   String[] postStr(String key, Map<String,String> args)
   {
