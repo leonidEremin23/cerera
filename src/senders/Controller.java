@@ -83,7 +83,6 @@ public class Controller extends OutputStream implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     // запуск при старте
     initRun();
-    // TODO когда прокси нормально заработает
     beginTimer(mPauseRequest);
     attachStdout();
   }
