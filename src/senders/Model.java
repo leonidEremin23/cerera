@@ -198,7 +198,8 @@ class Model {
   String  loadHtml()
   {
     // https://metanit.com/java/tutorial/7.3.php
-    StringBuilder body = new StringBuilder();
+    // тело страницы
+    StringBuffer body = new StringBuffer();
     List<String[]> lst = getMessagesList(); // список сообщений
     for(String[] r: lst) {
       // 0 - индекс сообщения, 1 - сообщение, 2 - дата

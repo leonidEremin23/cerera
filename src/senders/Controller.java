@@ -35,6 +35,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Controller extends OutputStream implements Initializable {
 
@@ -70,13 +71,20 @@ public class Controller extends OutputStream implements Initializable {
   @FXML
   TextArea  txt_stdout;
 
+  // признак запроса к серверу
+  private AtomicInteger mAskRequest = new AtomicInteger(0);
+
+  private int mPauseRequest = 5; // время интервала опроса сервера
+
+  // данные по отправителям
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     // запуск при старте
     initRun();
-    beginTimer();
+    // TODO когда прокси нормально заработает
+    beginTimer(mPauseRequest);
     attachStdout();
   }
 
@@ -92,15 +100,14 @@ public class Controller extends OutputStream implements Initializable {
         filledAdresat(); //
       }
     });
-    loadSenders();
-    // выбрать нулевой элемент
-    Platform.runLater(() -> selectRow(0));
+    loadSenders(null);
   }
 
   /**
-   * загрузить таблицу отправителей данными
+   * загрузить таблицу отправителей данными из локальной БД
+   * @param selectName выбранное имя
    */
-  private void loadSenders()
+  private void loadSenders(String selectName)
   {
     usersData.clear();  // очистить таблицу от данных
     List<String[]> lst = model.getSenders();
@@ -109,16 +116,68 @@ public class Controller extends OutputStream implements Initializable {
     for(String[] r: lst) {
       usersData.add(new Stroka(r[0],r[1],r[2]));
     }
-    //
-//    col_im.setCellValueFactory(cellData -> cellData.getValue().imProperty());
-//    col_from.setCellValueFactory(cellData -> cellData.getValue().fromProperty());
-//    col_dat.setCellValueFactory(cellData -> cellData.getValue().datProperty());
     // заполняем таблицу данными
     list_senders.setItems(usersData);
+    // после отображения выбрать 0 строку списка отправителей
+    Platform.runLater(() -> selectRow(selectName));
+  }
+
+
+  /**
+   * выбрать строку таблицы с указанным именем,
+   * если указан null, то выделение на самой первой строке
+   * @param nam имя пользователя
+   */
+  private void selectRow(String nam)
+  {
+    javafx.scene.control.MultipleSelectionModel<Stroka> newsel;
+    newsel = list_senders.getSelectionModel();
+    if(nam != null) {
+      ObservableList<Stroka> odat = list_senders.getItems();
+      int n = odat.size();
+      for(int i = 0; i < n; i++) {
+        Stroka stro = odat.get(i);
+        String sn = stro.getFrom();
+        if(sn != null && nam.contentEquals(sn)) {
+          newsel.select(stro);
+          return;
+        }
+      }
+    }
+    newsel.select(0);
   }
 
   /**
-   * зарузить сообщения
+   * заполнить имя адресата из ListView и вывести список его сообщений
+   */
+  private void filledAdresat()
+  {
+    javafx.scene.control.MultipleSelectionModel<Stroka> selmodel = list_senders.getSelectionModel();
+    Stroka stro = selmodel.getSelectedItem();
+    if(stro != null) {
+      String fro = stro.getFrom();  // имя отправителя
+      prepareAdresat(fro);
+      // обновить список сообщений после отображения
+      Platform.runLater(() -> loadMessages());
+    }
+  }
+
+  /**
+   * приготовить имя адресата и записать его в поле txt_adresat
+   * @param userName новое имя пользователя
+   * @return имя адресата
+   */
+  private String  prepareAdresat(String userName)
+  {
+    String sadr;
+    model.setAdresat(userName);
+    sadr = model.getAdresat();
+    txt_adresat.setText(sadr);
+    return sadr;
+  }
+
+  /**
+   * зарузить сообщения в WebView из локальной БД
    */
   private void  loadMessages()
   {
@@ -157,46 +216,34 @@ public class Controller extends OutputStream implements Initializable {
   }
 
   /**
-   * выбрать строку таблицы с указанным индексом сообщения,
-   * если указан 0, то выделение на самой первой строке
-   * @param im индекс сообщения
-   */
-  private void selectRow(int im)
-  {
-    javafx.scene.control.MultipleSelectionModel<Stroka> newsel;
-    newsel = list_senders.getSelectionModel();
-    newsel.select(im);
-  }
-
-  /**
-   * заполнить имя адресата из ListView
-   */
-  private void filledAdresat()
-  {
-    javafx.scene.control.MultipleSelectionModel<Stroka> selmodel = list_senders.getSelectionModel();
-    Stroka stro = selmodel.getSelectedItem();
-    if(stro != null) {
-      String fro = stro.getFrom();  // имя отправителя
-      prepareAdresat(fro);
-      // обновить список сообщений после отображения
-      Platform.runLater(() -> loadMessages());
-    }
-  }
-
-  /**
    * опрос сервера
    * @param ae событие
    */
   public void onclick_btn_request(ActionEvent ae)
   {
-    Model model = new Model();
-    int n;
-    n = model.loadNewMessages();
-    if(n > 0) {
-      loadSenders(); //
-      // после отображения выбрать 0 строку списка отправителей
-      Platform.runLater(() -> selectRow(0));
+    if(R.getUsr() != null) {
+      // если задано имя текущего пользователя,
+      // то опросим сервер
+      requestServer();
     }
+  }
+
+  /**
+   * опросить web-сервер на предмет новых сообщений
+   */
+  private void  requestServer()
+  {
+    // если запрос уже отправлен, то ничего не делать
+    if(mAskRequest.get() > 0) {
+      System.err.println("ждем ответ сервера...");
+      return;
+    }
+    // отметим, что запрос к серверу сделан
+    mAskRequest.incrementAndGet();
+    // формируем отдельный поток для опроса сервера
+    MyWebRequest request = new MyWebRequest();
+    Thread  thread = new Thread(request);
+    thread.start(); // стартуем поток для опроса
   }
 
   /**
@@ -236,44 +283,36 @@ public class Controller extends OutputStream implements Initializable {
   private void afterSendMessage()
   {
     txt_send.setText(null);
-    loadSenders();
+    loadSenders(model.getAdresat());
     // обновить список сообщений после отображения
-    Platform.runLater(() -> loadMessages());
+    //Platform.runLater(() -> loadMessages());
   }
 
-  private int count = 0;
+  private Timeline mTimeline;   // тайм-лайн опроса сервера
   // запуск таймера для обновления списка сообщений
-  private void beginTimer()
+  private void beginTimer(int pause)
   {
-    Timeline timeline = new Timeline();
-    timeline.setCycleCount(Animation.INDEFINITE);
+    if(mTimeline != null) {
+      // уже был таймер
+      mTimeline.stop();
+    }
+    //
+    mPauseRequest = pause;
+    //
+    mTimeline = new Timeline();
+    mTimeline.setCycleCount(Animation.INDEFINITE);
     KeyFrame keyFrame = new KeyFrame(
-        Duration.seconds(10),
+        Duration.seconds(mPauseRequest),
         event -> {
           // https://issue.life/questions/53587355
           //txt_send.setText(String.valueOf(count++));
-          count++;
           // обновить данные с сервера
           onclick_btn_request(null);
         }
     );
-    timeline.getKeyFrames().add(keyFrame);
-    System.out.println("TimeLine thread id "+ Thread.currentThread().getId());
-    timeline.play();
-  }
-
-  /**
-   * приготовить имя адресата и записать его в поле txt_adresat
-   * @param userName новое имя пользователя
-   * @return имя адресата
-   */
-  private String  prepareAdresat(String userName)
-  {
-    String sadr;
-    model.setAdresat(userName);
-    sadr = model.getAdresat();
-    txt_adresat.setText(sadr);
-    return sadr;
+    mTimeline.getKeyFrames().add(keyFrame);
+    mTimeline.play();
+    // System.err.println("TimeLine thread id "+ Thread.currentThread().getId() + " пауза " + pause + " c");
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -307,6 +346,24 @@ public class Controller extends OutputStream implements Initializable {
   @Override
   public void write(int b) {
     Platform.runLater(() -> txt_stdout.appendText(""+b));
+  }
+
+  /**
+   * Отдельный поток для опроса сервера о новых сообщениях
+   */
+  class MyWebRequest implements Runnable {
+    @Override
+    public void run() {
+      //System.err.println("+++ start опрос");
+      // опросить сервер и загрузить в локальную БД новые сообщения
+      int n = model.loadNewMessages();
+      if(n > 0) {
+        // после отображения выбрать загрузить получателей из локальной БД
+        Platform.runLater(() -> loadSenders(null));
+      }
+      mAskRequest.decrementAndGet();
+      System.err.println(R.Now() + " опрос сообщений: " + n);
+    }
   }
 
 } // end of class
