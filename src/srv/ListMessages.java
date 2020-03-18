@@ -27,10 +27,7 @@ public class ListMessages extends ServerData {
    * @param uFrom отправитель
    * @param uTo   получатель
    * @return список массивов строк
-   * [
-   *   ["номер", "отправитель", "получатель", "дата"],
-   *   [...]
-   * ]
+   * [ ["номер", "отправитель", "получатель", "дата"], [...] ]
    */
   public List<String[]> get(String uFrom, String uTo)
   {

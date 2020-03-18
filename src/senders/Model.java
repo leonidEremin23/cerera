@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 class Model {
+
   private static final int  sAgoDays = 180;  // время жизни сообщений (дни)
 
   private Database mDb;
