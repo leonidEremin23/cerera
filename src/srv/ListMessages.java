@@ -5,7 +5,7 @@
  */
 
 /*
-   Получить список сообщений от одного пользователя другому
+   Получить список новых сообщений от одного пользователя другому
    результат массив массивов строк
    Collection<String[]>
    ["номер", "отправитель", "получатель", "дата"]
@@ -19,28 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ListMessages extends ServerData {
-  private final static String sKey = "listmessages";  // ключ метки
-
-  public int[] getInt(String uFrom, String uTo)
-  {
-    List<String[]> lstr;
-    lstr = get(uFrom, uTo);
-    if(lstr != null) {
-      int n = lstr.size();  // размер списка
-      int[] ari = new int[n]; // массив целых
-      for(int i = 0; i < n; i++) {
-        try {
-          String[] sai = lstr.get(i);
-          int a = Integer.parseInt(sai[0]);
-          ari[i] = a;
-        } catch (Exception e) {
-          System.err.println("?-error-ListMessages.getInt() ошибка " + e.getMessage());
-        }
-      }
-      return ari;
-    }
-    return null;
-  }
+  private final static String sKey = "list";  // ключ метки
 
   /**
    * вернуть список массивов строк с данными о сообщениях
@@ -48,7 +27,10 @@ public class ListMessages extends ServerData {
    * @param uFrom отправитель
    * @param uTo   получатель
    * @return список массивов строк
-   * [ ["номер", "отправитель", "получатель", "дата"], [...] ]
+   * [
+   *   ["номер", "отправитель", "получатель", "дата"],
+   *   [...]
+   * ]
    */
   public List<String[]> get(String uFrom, String uTo)
   {
