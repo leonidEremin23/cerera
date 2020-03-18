@@ -74,7 +74,7 @@ public class Controller extends OutputStream implements Initializable {
   // признак запроса к серверу
   private AtomicInteger mAskRequest = new AtomicInteger(0);
 
-  private int mPauseRequest = 20; // время интервала опроса сервера
+  private int mPauseRequest = 7; // время интервала опроса сервера
 
   // данные по отправителям
   private ObservableList<Stroka> usersData = FXCollections.observableArrayList();
@@ -363,7 +363,7 @@ public class Controller extends OutputStream implements Initializable {
       }
       // убавим признак - сообщения прочитаны с сервера
       mAskRequest.decrementAndGet();
-      // /// System.err.println(R.Now() + " опрос сообщений: " + n);
+      System.err.println(R.Now() + " опрос сообщений: " + n);
     }
   }
 
