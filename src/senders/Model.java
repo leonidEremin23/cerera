@@ -201,6 +201,7 @@ class Model {
    */
   String  loadHtml()
   {
+    final String fmt = "<div class='%s'>%s<br><span class='dt'>%s</span></div>";
     // https://metanit.com/java/tutorial/7.3.php
     // тело страницы
     StringBuffer body = new StringBuffer();
@@ -211,9 +212,10 @@ class Model {
       String msg = r[1];  // сообщение
       String dat = formatDate(r[2]);  // дата
       String cls = (im > 0)? "itm": "mym";  // их сообщение >0; моё сообщение <0
-      final String fmt = "<div class='%s'>%s<br><span class='dt'>%s</span></div>";
-      String sdiv = String.format(fmt, cls,msg, dat);
-      body.append(sdiv);
+      // замена угловых скобок
+      String str = msg.replace("<", "&lt;").replace(">", "&gt;");
+      String sdv = String.format(fmt, cls, str, dat);
+      body.append(sdv);
     }
     // загрузить шаблон страницы из ресурса
     String txt = R.readRes("/html/mess.html");
