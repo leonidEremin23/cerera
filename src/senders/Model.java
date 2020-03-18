@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 class Model {
+  private static final int  sAgoDays = 180;  // время жизни сообщений (дни)
 
   private Database mDb;
 
@@ -95,6 +96,8 @@ class Model {
     if(pwd == null) {
       return 0;
     }
+    //
+    purgeDb();
     // получим список новых сообщений и загрузим их в БД
     ListMessages lm = new ListMessages();
     List<String[]> lst = lm.get(null, uTo);
@@ -120,6 +123,9 @@ class Model {
         cnt++;
       }
     }
+    //
+    // purgeDb();
+    //
     return cnt;
   }
 
@@ -215,9 +221,8 @@ class Model {
     return out;
   }
 
-  private static final SimpleDateFormat sInpfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  private static final SimpleDateFormat sOutfmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
+  private static final SimpleDateFormat  sInpfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private static final SimpleDateFormat  sOutfmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
   /**
    * преобразовать формат даты
    * @param strDat входной формат даты
@@ -232,6 +237,26 @@ class Model {
       System.err.println("?-error-formatDate() " + e.getMessage());
     }
     return strDat;
+  }
+
+  /**
+   * очистить локальную БД от старых сообщений, время
+   * которых более sAgoDays дней назад
+   */
+  private void purgeDb()
+  {
+//    final DateTimeFormatter sDtmfmt = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
+//    LocalDateTime dat = LocalDateTime.now().minusHours(sTTL);
+//    String str = sDtmfmt.format(dat);
+//    String sql = "DELETE FROM mess WHERE wdat < '" + str + "'";
+    int a;
+    String sql;
+    sql = "DELETE FROM mess WHERE wdat < " +
+          "DATETIME('now','localtime','-" + sAgoDays + " days')";
+    a = mDb.ExecSql(sql);
+    if(a > 0) {
+      System.err.println("?-warning-удалено старых сообщений: " + a);
+    }
   }
 
 } // end of class
