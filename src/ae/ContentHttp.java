@@ -72,7 +72,8 @@ public class ContentHttp {
    */
   public String getContent(String urlQuest, Map<String,String> postArgs)
   {
-    final String user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
+    //final String user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
+    final String user_agent = "Mozilla/5.0";
     String output = null;
      try {
       // таймаут

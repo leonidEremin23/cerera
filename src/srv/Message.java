@@ -12,7 +12,6 @@ package srv;
 import ae.MyCrypto;
 import ae.R;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Message extends ServerData

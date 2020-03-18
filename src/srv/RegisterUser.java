@@ -9,7 +9,6 @@
  */
 package srv;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterUser extends ServerData {
