@@ -9,9 +9,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="keygenmy.Controller">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.172-ea"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="keygenmy.Controller">
 
-      <Label text="Регистрация нового пользователя" textFill="#3d0985" GridPane.columnIndex="1">
+      <Label text="Регистрация нового пользователя" fx:id="lbl_title" textFill="#3d0985" GridPane.columnIndex="1">
          <font>
             <Font name="Arial Bold" size="14.0" />
          </font></Label>
@@ -28,18 +29,5 @@
       <TextArea fx:id="ta_publicKey" prefHeight="150.0" prefWidth="300.0" promptText="публичный ключ" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <TextArea fx:id="ta_privateKey" editable="false" prefHeight="150.0" prefWidth="300.0" promptText="приватный ключ" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
       <Label fx:id="lbl_server" text="сервер" textFill="#340985" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-   <columnConstraints>
-      <ColumnConstraints />
-      <ColumnConstraints />
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-   </rowConstraints>
 
 </GridPane>

@@ -32,7 +32,7 @@ public class UserList extends ServerData {
   }
 
   /**
-   * проверяет наличие в списке указанного имени
+   * проверяет наличие в списке указанного имени, игнорируя регистр букв
    * @param username  имя
    * @return true - пользоатель есть в списке, false - нет в списке
    */
@@ -43,7 +43,7 @@ public class UserList extends ServerData {
       return true;  // как-будто есть, чтобы не регистрировался
     }
     for (String u : mUsers) {
-      if (u.contentEquals(username)) {
+      if (u.equalsIgnoreCase(username)) {
         return true;
       }
     }

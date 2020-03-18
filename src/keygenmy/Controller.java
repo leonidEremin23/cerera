@@ -22,6 +22,8 @@ public class Controller implements Initializable {
   private boolean canRegister;
 
   @FXML
+  Label       lbl_title;
+  @FXML
   TextField   txt_user;
   @FXML
   TextField   txt_result;
@@ -54,6 +56,10 @@ public class Controller implements Initializable {
     if(usr != null) {
       btn_check.setDisable(true);
       btn_keygen.setDisable(true);
+      ta_publicKey.setText(R.getUsrPublickey(usr));
+      ta_privateKey.setText(R.getUsrPrivatekey(usr));
+      txt_result.setText(R.getUsrPwd(usr));
+      lbl_title.setText("данные пользователя");
     }
   }
 
@@ -81,7 +87,8 @@ public class Controller implements Initializable {
     if(!res) {
       String errMess = "Ошибка добавления пользователя " + usr + " / " + model.getLastError();
       ta_privateKey.setText(errMess);
-      ta_publicKey.setText("");
+    } else {
+      txt_result.setText(R.getUsrPwd(busr));
     }
   }
 
