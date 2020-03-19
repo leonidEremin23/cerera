@@ -25,12 +25,13 @@ import java.util.regex.Pattern;
 */
 /*
 Modify:
-  08.03.20  передача и прием сообщений
-
+  08.03.20 передача и прием сообщений
+  19.03.20 формирование списка сообщений на основе имен
 */
 
 public class R {
-  final static String Ver = "2.0"; // номер версии
+
+  // public final static String Ver = "2.1"; // номер версии
 
   // рабочая БД
   private static String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)

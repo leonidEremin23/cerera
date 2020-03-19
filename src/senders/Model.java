@@ -60,27 +60,28 @@ class Model {
   List<String[]>  getSenders()
   {
     String  sql;
-    sql = "SELECT DISTINCT ufrom,MAX(wdat) as dd,COUNT(*) FROM mess WHERE im > 0 GROUP BY ufrom " +
+    sql =
+        "SELECT DISTINCT ufrom,MAX(wdat) as dd,COUNT(*) FROM mess WHERE ufrom!='" +R.getUsr() + "' GROUP BY ufrom " +
         "UNION " +
-        "SELECT DISTINCT usr,wdat as dd,1 FROM keys WHERE mykey=0 AND usr NOT IN (SELECT ufrom FROM mess) " +
+        "SELECT DISTINCT usr,wdat as dd,0 FROM keys WHERE mykey=0 AND usr NOT IN (SELECT ufrom FROM mess) " +
         "ORDER BY dd desc;";
     ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
     return ar1;
   }
 
   /**
-   * выдать список данных по сообщениям
-   * индекс > 0 сообщение нам, < 0 наше сообщение
+   * выдать список данных по сообщениям.
+   * индекс 0 сообщение нам, 1 наше сообщение
    * @return список данных
    * 0 - индекс сообщения, 1 - сообщение, 2 - дата
    */
   private List<String[]>  getMessagesList()
   {
     String  sql;
-    sql = "SELECT im,msg,wdat FROM mess WHERE im > 0 AND ufrom='" + mAdresat + "' " +
-        "UNION " +
-        "SELECT im,msg,wdat FROM mess WHERE im<0 AND uto='" + mAdresat + "' " +
-        "ORDER BY wdat;";
+    sql = "SELECT 0,msg,wdat,im FROM mess WHERE ufrom='" + mAdresat + "' " +
+          "UNION " +
+          "SELECT 1,msg,wdat,im FROM mess WHERE uto='" + mAdresat + "' " +
+          "ORDER BY wdat;";
     ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
     return ar1;
   }
@@ -114,7 +115,13 @@ class Model {
     ArrayList<String[]> ars = mDb.DlookupArray(sql);
     int cnt = 0;
     for(String[] r: ars) {
-      Integer im = Integer.parseInt(r[0]);
+      int im;
+      try {
+        im = Integer.parseInt(r[0]);
+      } catch (Exception e) {
+        System.err.println("?-error-loadNewMessages() неверный номер сообщения " + r[0] + ". " + e.getMessage());
+        continue;
+      }
       Message ms = new Message();
       String msg = ms.get(uTo, im);
       if(msg != null) {
@@ -138,11 +145,9 @@ class Model {
   boolean sendMessage(String textMsg)
   {
     SendMessage sm = new SendMessage();
-    int b = sm.post(mAdresat, textMsg);
-    if(b > 0) {
-      // запишем в локальную БД своё сообщение с отрицательным знаком
-      // индекс своего сообщения меньше 0.
-      int im = 0 - b;
+    int im = sm.post(mAdresat, textMsg);
+    if(im > 0) {
+      // запишем в локальную БД своё сообщение
       String sql = "INSERT INTO mess(im,ufrom,uto,msg,wdat) VALUES("
                 + im               + ","
           + "'" + R.getUsr()       + "',"
@@ -207,11 +212,11 @@ class Model {
     StringBuffer body = new StringBuffer();
     List<String[]> lst = getMessagesList(); // список сообщений
     for(String[] r: lst) {
-      // 0 - индекс сообщения, 1 - сообщение, 2 - дата
-      int im = Integer.parseInt(r[0]); // индекс
+      // 0 - индекс сообщения (0 чужое, 1 свое), 1 - сообщение, 2 - дата
+      // класс стиля блока сообщения на основе индекса-признака
+      String cls = "sm" + r[0];  // их сообщение sm0, моё сообщение sm1;
       String msg = r[1];  // сообщение
       String dat = formatDate(r[2]);  // дата
-      String cls = (im > 0)? "itm": "mym";  // их сообщение >0; моё сообщение <0
       // замена угловых скобок
       String str = msg.replace("<", "&lt;").replace(">", "&gt;");
       String sdv = String.format(fmt, cls, str, dat);
