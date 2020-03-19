@@ -274,7 +274,6 @@ public class MyCrypto {
     return b;
   }
 
-  // TODO сделать проверку хэш-суммы сообщения
   // CRC32 https://www.quickprogrammingtips.com/java/how-to-calculate-crc32-checksum-in-java.html
   // http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java
   // https://docs.oracle.com/javase/8/docs/api/java/security/MessageDigest.html

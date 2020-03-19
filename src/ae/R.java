@@ -6,19 +6,13 @@
 
 package ae;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * Ресурсный класс
@@ -36,16 +30,12 @@ public class R {
   // рабочая БД
   private static String WorkDB = "cerera.db";   // CentOs Linux (в Windows будет D:\var\Gmir\*.db)
   private static Database  db;   // база данных проекта
-  // выдать временный каталог (завершается обратным слэшем)
-  //public final static String TmpDir = System.getProperty("java.io.tmpdir");
-  // разделитель имени каталогов
-  //public final static String sep = System.getProperty("file.separator");
 
-  private static String  Usr;        // имя пользователя в программе не задано
+  private static String  Usr;                 // имя пользователя в программе не задано
   private static String  Server = _r.Server;  // адрес сервера
-  static String ProxyServer = _r.proxyserv;  // proxy сервер
-  static int    ProxyPort   = _r.proxyport;  // порт proxy-сервера
-  static int    TimeOut     = 30000;         // тайм-аут мс
+  static String ProxyServer = _r.proxyserv;   // proxy сервер
+  static int    ProxyPort   = _r.proxyport;   // порт proxy-сервера
+  static int    TimeOut     = 30000;          // тайм-аут мс
   static String ProxyUser   = _r.proxyuser;
   static String ProxyPass   = _r.proxypass;
   //
