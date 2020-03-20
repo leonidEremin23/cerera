@@ -224,8 +224,8 @@ class Model {
     }
     // загрузить шаблон страницы из ресурса
     String txt = R.readRes("/html/mess.html");
-    // вставить в шаблон (%s) тело страницы
-    String out = String.format(txt, body);
+    // вставить в шаблон (@@@) тело страницы
+    String out = txt.replace("@@@", body);
     return out;
   }
 
