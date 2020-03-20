@@ -45,10 +45,10 @@ public class SendMessage extends ServerData {
     //
     String[] otv = super.postStr(sKey, args);
     try {
-      Integer ii = Integer.parseInt(otv[0]);
+      int ii = Integer.parseInt(otv[0]);
       return ii;
     } catch (Exception e) {
-      System.err.println("?-error-SendMessage.post " + e.getMessage());
+      System.err.println("?-error-SendMessage.post неверный формат числа [" + otv[0] + "] " + e.getMessage());
     }
     return 0;
   }
