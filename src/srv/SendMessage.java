@@ -53,4 +53,4 @@ public class SendMessage extends ServerData {
     return 0;
   }
 
-}
+} // end of class

@@ -26,15 +26,12 @@ public class ListMessages extends ServerData {
    * https://habr.com/ru/post/237043/
    * @param uFrom отправитель
    * @param uTo   получатель
+   * @param pwd   пароль (получателя)
    * @return список массивов строк
    * [ ["номер", "отправитель", "получатель", "дата"], [...] ]
    */
-  public List<String[]> get(String uFrom, String uTo)
+  public List<String[]> get(String uFrom, String uTo, String pwd)
   {
-    String pwd = R.getUsrPwd(uTo);
-    if(pwd == null) {
-      return null;
-    }
     Map<String,String> args = prepareArgs(
         "from", uFrom,
         "to",   uTo,

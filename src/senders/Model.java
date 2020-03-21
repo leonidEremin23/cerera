@@ -93,16 +93,16 @@ class Model {
    */
   int loadNewMessages()
   {
-    String  uTo = R.getUsr();
-    String  pwd = R.getUsrPwd(uTo);
+    final String  uTo = R.getUsr();       // имя пользователя
+    final String  pwd = R.getUsrPwd(uTo); // пароль пользователя
     if(pwd == null) {
       return 0;
     }
     //
     purgeDb();
-    // получим список новых сообщений и загрузим их в БД
+    // получим список новых сообщений и загрузим их в локальную БД
     ListMessages lm = new ListMessages();
-    List<String[]> lst = lm.get(null, uTo);
+    List<String[]> lst = lm.get(null, uTo, pwd);
     if(lst != null) {
       for(String[] r: lst) {
         String fmt = "INSERT INTO mess (im,ufrom,uto,wdat) VALUES('%s','%s','%s','%s')";
@@ -122,8 +122,9 @@ class Model {
         System.err.println("?-error-loadNewMessages() неверный номер сообщения " + r[0] + ". " + e.getMessage());
         continue;
       }
+      // получить текст сообщения
       Message ms = new Message();
-      String msg = ms.get(uTo, im);
+      String msg = ms.get(im);
       if(msg != null) {
         String imsg = mDb.s2s(msg);
         String isql = "UPDATE mess SET msg =" + imsg + " WHERE im=" + im;

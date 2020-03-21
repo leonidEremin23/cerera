@@ -13,6 +13,11 @@ import java.util.Map;
 public class PubKey extends ServerData {
   private final static String sKey = "pubkey";  // ключ метки
 
+  /**
+   * получить публичный ключ пользователя с web-сервера
+   * @param usr имя пользователя
+   * @return публичный ключ, если ошибка null
+   */
   public String  get(String usr)
   {
     Map<String,String> args = prepareArgs("usr", usr);
@@ -23,4 +28,4 @@ public class PubKey extends ServerData {
     return null;
   }
 
-}
+} // end of class
