@@ -96,10 +96,11 @@ public class ServerData {
       int n = ja.length();
       for(int i = 0; i < n; i++) {
         try {
-          String s = (String) ja.get(i);
+          Object o = ja.get(i);
+          String s = (o.equals(null))? null: (String)o;
           arr.add(s);
         } catch (Exception e) {
-          System.err.println("?-error-тип элемента массива не String");
+          System.err.println("?-error-неправильный тип элемента массива");
           return null;
         }
       }
@@ -152,19 +153,23 @@ public class ServerData {
     ArrayList<String[]> alist = new ArrayList<>();
     int n = ja.length();  // кол-во элементов списка
     for(int i = 0; i < n; i++) {
-      String[] astr = null;
       try {
         JSONArray js = (JSONArray) ja.get(i); // массив строк
         int jn = js.length();
-        astr = new String[jn];
+        String[] astr = new String[jn];
         for(int j = 0; j < jn; j++) {
-          String s = (String) js.get(j);
+          String s;
+          try {
+            s = (String) js.get(j);
+          } catch (Exception e) {
+            s = null;
+          }
           astr[j] = s;
         }
+        alist.add(astr);
       } catch (Exception e) {
         System.err.println("?-error-postList() ошибка преобразования типа: " + e.getMessage());
       }
-      alist.add(astr);
     }
     return  alist;
   }

@@ -307,6 +307,22 @@ public class R {
     return t;
   }
 
+  public static int intval(String str)
+  {
+    try {
+      int i = Integer.parseInt(str);
+      return i;
+    } catch (Exception e) {
+      System.err.println("?-error-intval() " + e.getMessage());
+    }
+    return 0;
+  }
+
+  public static String s2s(String str)
+  {
+    return db.s2s(str);
+  }
+
   /**
    * Получить из события сцену, где оно случилось
    * @param ae  событие

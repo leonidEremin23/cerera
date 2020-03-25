@@ -20,6 +20,22 @@ public class Message extends ServerData
 
   /**
    * получить сообщение для текущего пользователя
+   * @param imStr строка с номером сообщения
+   * @return строка сообщения
+   */
+  public String get(String imStr)
+  {
+    try {
+      int im = Integer.parseInt(imStr);
+      return get(im);
+    } catch (Exception e) {
+      System.err.println("?-error-Message.get() ошибка в номере сообщения: " +imStr + ". " + e.getMessage());
+    }
+    return null;
+  }
+
+  /**
+   * получить сообщение для текущего пользователя
    * @param im  номер сообщения
    * @return строка сообщения
    */

@@ -12,10 +12,8 @@ package senders;
 
 import ae.Database;
 import ae.R;
-import srv.ListMessages;
-import srv.Message;
-import srv.PubKey;
-import srv.SendMessage;
+import org.omg.CORBA.PRIVATE_MEMBER;
+import srv.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,25 +63,24 @@ class Model {
         "UNION " +
         "SELECT DISTINCT usr,wdat as dd,0 FROM keys WHERE mykey=0 AND usr NOT IN (SELECT ufrom FROM mess) " +
         "ORDER BY dd desc;";
-    ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
-    return ar1;
+    return mDb.DlookupArray(sql);
   }
 
   /**
    * выдать список данных по сообщениям.
-   * индекс 0 сообщение нам, 1 наше сообщение
+   * индекс 0 сообщение нам, 1 наше сообщение.
+   * у чужих сообщений дата чтения всегда NULL
    * @return список данных
-   * 0 - индекс сообщения, 1 - сообщение, 2 - дата
+   * 0 - индекс сообщения, 1 - сообщение, 2 - дата, 3 - дата чтения
    */
   private List<String[]>  getMessagesList()
   {
     String  sql;
-    sql = "SELECT 0,msg,wdat,im FROM mess WHERE ufrom='" + mAdresat + "' " +
+    sql = "SELECT 0,msg,wdat,NULL FROM mess WHERE ufrom='" + mAdresat + "' " +
           "UNION " +
-          "SELECT 1,msg,wdat,im FROM mess WHERE uto='" + mAdresat + "' " +
+          "SELECT 1,msg,wdat,datr FROM mess WHERE uto='" + mAdresat + "' " +
           "ORDER BY wdat;";
-    ArrayList<String[]> ar1 = mDb.DlookupArray(sql);
-    return ar1;
+    return mDb.DlookupArray(sql);
   }
 
   /**
@@ -110,20 +107,46 @@ class Model {
         mDb.ExecSql(sql);
       }
     }
+    //
+    int cnt = 0;
+    // загрузим даты прочтения своих сообщений
+//    String sqlr = "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uTo +"'";
+//    ArrayList<String[]> arsr = mDb.DlookupArray(sqlr);
+//    Datr dr = new Datr();
+//    for(String[] r: arsr) {
+//      String im = r[0];
+//      // получить дату прочтения сообщения
+//      String dat = dr.get(im);
+//      if(dat != null) {
+//        String sdat = mDb.s2s(dat);
+//        String isql = "UPDATE mess SET datr =" + sdat + " WHERE im=" + im;
+//        mDb.ExecSql(isql);
+//        cnt++;  // как-бы загрузили
+//      }
+//    }
+    //
+    String sqlr = "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uTo +"'";
+    ArrayList<String[]> arsr = mDb.DlookupArray(sqlr);
+    Datr dr = new Datr();
+    List<String[]> arsim = dr.get(arsr);
+    if(arsim != null) {
+      for (String[] r : arsim) {
+        int im = R.intval(r[0]);
+        String sdat = R.s2s(r[1]);  // получить дату прочтения сообщения
+        String isql = "UPDATE mess SET datr=" + sdat + " WHERE im=" + im;
+        mDb.ExecSql(isql);
+        cnt++;  // как-бы загрузили
+      }
+    }
+
+    //
     // загрузим текст новых сообщений в БД
     String sql = "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uTo +"'";
     ArrayList<String[]> ars = mDb.DlookupArray(sql);
-    int cnt = 0;
+    Message ms = new Message();
     for(String[] r: ars) {
-      int im;
-      try {
-        im = Integer.parseInt(r[0]);
-      } catch (Exception e) {
-        System.err.println("?-error-loadNewMessages() неверный номер сообщения " + r[0] + ". " + e.getMessage());
-        continue;
-      }
       // получить текст сообщения
-      Message ms = new Message();
+      String im = r[0];
       String msg = ms.get(im);
       if(msg != null) {
         String imsg = mDb.s2s(msg);
@@ -132,8 +155,6 @@ class Model {
         cnt++;
       }
     }
-    //
-    // purgeDb();
     //
     return cnt;
   }
@@ -189,7 +210,7 @@ class Model {
   }
 
   /**
-   * вернуть значение поля заданного пользователя
+   * вернуть значение поля у заданного пользователя
    * @param usr     пользователь
    * @param fldName имя поля
    * @return  содержимое поля или '?'
@@ -197,8 +218,7 @@ class Model {
   private String getFldKeys(String usr, String fldName)
   {
     String sql = "SELECT " + fldName + " FROM keys WHERE usr='" + usr + "'";
-    String msg = mDb.Dlookup(sql);
-    return msg;
+    return mDb.Dlookup(sql);
   }
 
   /**
@@ -207,20 +227,22 @@ class Model {
    */
   String  loadHtml()
   {
-    final String fmt = "<div class='%s'>%s<br><span class='dt'>%s</span></div>";
+    final String fmt = "<div class='%s%s'>%s<br><span class='dt'>%s</span></div>";
     // https://metanit.com/java/tutorial/7.3.php
     // тело страницы
     StringBuffer body = new StringBuffer();
     List<String[]> lst = getMessagesList(); // список сообщений
     for(String[] r: lst) {
-      // 0 - индекс сообщения (0 чужое, 1 свое), 1 - сообщение, 2 - дата
+      // 0 - признак (0 чужое, 1 свое), 1 - сообщение, 2 - дата, 3 - дата чтения
       // класс стиля блока сообщения на основе индекса-признака
       String cls = "sm" + r[0];  // их сообщение sm0, моё сообщение sm1;
+      // класс прочитанного (своё) сообений
+      String clr = (r[3] == null)? "": " r";
       String msg = r[1];  // сообщение
       String dat = formatDate(r[2]);  // дата
       // замена угловых скобок
       String str = msg.replace("<", "&lt;").replace(">", "&gt;");
-      String sdv = String.format(fmt, cls, str, dat);
+      String sdv = String.format(fmt, cls, clr, str, dat);
       body.append(sdv);
     }
     // загрузить шаблон страницы из ресурса
@@ -254,10 +276,6 @@ class Model {
    */
   private void purgeDb()
   {
-//    final DateTimeFormatter sDtmfmt = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
-//    LocalDateTime dat = LocalDateTime.now().minusHours(sTTL);
-//    String str = sDtmfmt.format(dat);
-//    String sql = "DELETE FROM mess WHERE wdat < '" + str + "'";
     int a;
     String sql;
     sql = "DELETE FROM mess WHERE wdat < " +
