@@ -130,12 +130,15 @@ class Model {
     Datr dr = new Datr();
     List<String[]> arsim = dr.get(arsr);
     if(arsim != null) {
-      for (String[] r : arsim) {
-        int im = R.intval(r[0]);
-        String sdat = R.s2s(r[1]);  // получить дату прочтения сообщения
-        String isql = "UPDATE mess SET datr=" + sdat + " WHERE im=" + im;
-        mDb.ExecSql(isql);
-        cnt++;  // как-бы загрузили
+      for (String[] r: arsim) {
+        // дата прочтения сообщения
+        if(r[1] != null) {
+          int im = R.intval(r[0]);
+          String sda = R.s2s(r[1]);
+          String isq = "UPDATE mess SET datr=" + sda + " WHERE im=" + im;
+          mDb.ExecSql(isq);
+          cnt++;  // как-бы загрузили
+        }
       }
     }
 
