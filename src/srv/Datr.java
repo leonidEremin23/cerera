@@ -14,9 +14,11 @@ import ae.R;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class Datr extends ServerData {
   private final static String sKey = "datr";  // ключ метки
+  private final static String sKey2 = "datrs";  // ключ метки для списка сообщений
 
   /**
    * получить дату чтения сообщения для текущего пользователя
@@ -72,21 +74,16 @@ public class Datr extends ServerData {
     //
     final String uTo = R.getUsr();        // пользователь (получатель)
     final String pwd = R.getUsrPwd(uTo);  // пароль пользователя получателя
+    // https://docs.oracle.com/javase/8/docs/api/java/util/StringJoiner.html
+    StringJoiner  sbuf = new StringJoiner(",", "[", "]");
+    for(String[] r: imsStr) { sbuf.add(r[0]); }
     //
-    StringBuffer sbuf = new StringBuffer();
-    sbuf.append("[");
-    String sep = "";
-    for(String[] r: imsStr) {
-      sbuf.append(sep).append(r[0]);
-      sep = ",";
-    }
-    sbuf.append("]");
     Map<String, String> args = prepareArgs(
         "ims", sbuf.toString(),
         "pwd", pwd
     );
-    List<String[]> ars = postList(sKey, args);
-    return ars;
+    //
+    return postList(sKey2, args);
   }
 
 
