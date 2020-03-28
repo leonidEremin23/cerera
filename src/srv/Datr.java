@@ -12,7 +12,6 @@ package srv;
 
 import ae.R;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -25,21 +24,21 @@ public class Datr extends ServerData {
 
   /**
    * выдать список дат чтения сообщений (дата будет в формате SQL YYYY-MM-DD hh:mm:ss)
-   * @param imStr  список масивов строк, где первый элемент - номер сообщения
-   *               [ ["номер1"], ["номер2"] ]
-   * @return массив [ ["номер1","дата_чтения1"], ["номер2","дата_чтения2"] ]
+   * @param ims  масcив номеров сообщений
+   * @return массив данных [ ["номер1","дата_чтения1"], ["номер2","дата_чтения2"] ]
    */
-  public List<String[]> get(List<String[]> imStr)
+  public List<String[]> get(int[] ims)
   {
-    if(imStr == null || imStr.size() < 1)
+    if(ims == null || ims.length < 1)
       return null;
     //
     final String uTo = R.getUsr();        // пользователь (получатель)
     final String pwd = R.getUsrPwd(uTo);  // пароль пользователя получателя
     // https://docs.oracle.com/javase/8/docs/api/java/util/StringJoiner.html
+    // получим строку вида [номер1,номер2]
     StringJoiner  sbuf = new StringJoiner(",", "[", "]");
-    for(String[] r: imStr) { sbuf.add(r[0]); }
-    //
+    for(int r: ims) { sbuf.add(Integer.toString(r)); }
+    // подготовим аргументы запроса
     Map<String, String> args = prepareArgs(
         "ims", sbuf.toString(),
         "pwd", pwd

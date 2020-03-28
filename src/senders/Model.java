@@ -12,7 +12,6 @@ package senders;
 
 import ae.Database;
 import ae.R;
-import org.omg.CORBA.PRIVATE_MEMBER;
 import srv.*;
 
 import java.text.SimpleDateFormat;
@@ -85,13 +84,14 @@ class Model {
 
   /**
    * загрузить новые сообщения для текущего пользователя и их текст
-   * в локальную таблицу из web-сервера
+   * в локальную таблицу из web-сервера. А потом, проверить даты чтения
+   * собственных сообщений и заполнить их в локальной БД.
    * @return кол-во загруженных сообщений
    */
   int loadNewMessages()
   {
-    final String  uTo = R.getUsr();       // имя пользователя
-    final String  pwd = R.getUsrPwd(uTo); // пароль пользователя
+    final String  uMe = R.getUsr();       // имя пользователя
+    final String  pwd = R.getUsrPwd(uMe); // пароль пользователя
     if(pwd == null) {
       return 0;
     }
@@ -99,7 +99,7 @@ class Model {
     purgeDb();
     // получим список новых сообщений и загрузим их в локальную БД
     ListMessages lm = new ListMessages();
-    List<String[]> lst = lm.get(null, uTo, pwd);
+    List<String[]> lst = lm.get(null, uMe, pwd);
     if(lst != null) {
       for(String[] r: lst) {
         String fmt = "INSERT INTO mess (im,ufrom,uto,wdat) VALUES('%s','%s','%s','%s')";
@@ -109,53 +109,48 @@ class Model {
     }
     //
     int cnt = 0;
-    // загрузим даты прочтения своих сообщений
-//    String sqlr = "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uTo +"'";
-//    ArrayList<String[]> arsr = mDb.DlookupArray(sqlr);
-//    Datr dr = new Datr();
-//    for(String[] r: arsr) {
-//      String im = r[0];
-//      // получить дату прочтения сообщения
-//      String dat = dr.get(im);
-//      if(dat != null) {
-//        String sdat = mDb.s2s(dat);
-//        String isql = "UPDATE mess SET datr =" + sdat + " WHERE im=" + im;
-//        mDb.ExecSql(isql);
-//        cnt++;  // как-бы загрузили
-//      }
-//    }
-    //
-    String sqlr = "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uTo +"'";
-    ArrayList<String[]> arsr = mDb.DlookupArray(sqlr);
-    Datr dr = new Datr();
-    List<String[]> arsim = dr.get(arsr);
-    if(arsim != null) {
-      for (String[] r: arsim) {
-        // дата прочтения сообщения
-        if(r[1] != null) {
-          int im = R.intval(r[0]);
-          String sda = R.s2s(r[1]);
-          String isq = "UPDATE mess SET datr=" + sda + " WHERE im=" + im;
-          mDb.ExecSql(isq);
-          cnt++;  // как-бы загрузили
+    // загрузим текст новых сообщений в БД
+    ArrayList<String[]> ars = mDb.DlookupArray(
+        "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uMe +"'"
+    );
+    if(ars != null && ars.size() > 0) {
+      // есть новые сообщения с незаполненным текстом
+      Message ms = new Message();
+      for (String[] r : ars) {
+        // индекс сообщения
+        int im = R.intval(r[0]);
+        // получить текст сообщения
+        String msg = ms.get(im);
+        if(msg != null) {
+          String txt = mDb.s2s(msg);
+          mDb.ExecSql("UPDATE mess SET msg =" + txt + " WHERE im=" + im);
+          cnt++;
         }
       }
     }
-
-    //
-    // загрузим текст новых сообщений в БД
-    String sql = "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uTo +"'";
-    ArrayList<String[]> ars = mDb.DlookupArray(sql);
-    Message ms = new Message();
-    for(String[] r: ars) {
-      // получить текст сообщения
-      String im = r[0];
-      String msg = ms.get(im);
-      if(msg != null) {
-        String imsg = mDb.s2s(msg);
-        String isql = "UPDATE mess SET msg =" + imsg + " WHERE im=" + im;
-        mDb.ExecSql(isql);
-        cnt++;
+    // загрузим даты прочтения наших сообщений, которые еще не прочитаны получателями
+    // получить список наших непрочитанных сообщений
+    ArrayList<String[]> ardr = mDb.DlookupArray(
+        "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uMe +"'"
+    );
+    if(ardr != null && ardr.size() > 0) {
+      // список не пустой
+      // преобразовать список массивов строк с номерами в массив чисел
+      // http://habr.com/ru/company/luxoft/blog/270383/
+      // http://annimon.com/article/2778
+      int[] ims = ardr.stream().mapToInt(s->Integer.parseInt(s[0])).toArray();
+      Datr dr = new Datr();
+      List<String[]> arsim = dr.get(ims);
+      if(arsim != null) {
+        for (String[] r: arsim) {
+          // дата прочтения сообщения
+          if(r[1] != null) {
+            int     im = R.intval(r[0]);
+            String sda = R.s2s(r[1]);
+            mDb.ExecSql("UPDATE mess SET datr=" + sda + " WHERE im=" + im);
+            cnt++;  // как-бы загрузили
+          }
+        }
       }
     }
     //
