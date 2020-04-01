@@ -15,7 +15,6 @@ import ae.R;
 import srv.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -110,13 +109,13 @@ class Model {
     //
     int cnt = 0;
     // загрузим текст новых сообщений в БД
-    ArrayList<String[]> ars = mDb.DlookupArray(
+    List<String[]> arnm = mDb.DlookupArray(
         "SELECT im FROM mess WHERE msg IS NULL AND uto='" + uMe +"'"
     );
-    if(ars != null && ars.size() > 0) {
+    if(arnm != null && arnm.size() > 0) {
       // есть новые сообщения с незаполненным текстом
       Message ms = new Message();
-      for (String[] r : ars) {
+      for (String[] r: arnm) {
         // индекс сообщения
         int im = R.intval(r[0]);
         // получить текст сообщения
@@ -130,7 +129,7 @@ class Model {
     }
     // загрузим даты прочтения наших сообщений, которые еще не прочитаны получателями
     // получить список наших непрочитанных сообщений
-    ArrayList<String[]> ardr = mDb.DlookupArray(
+    List<String[]> ardr = mDb.DlookupArray(
         "SELECT im FROM mess WHERE datr IS NULL AND ufrom='" + uMe +"'"
     );
     if(ardr != null && ardr.size() > 0) {
